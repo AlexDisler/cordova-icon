@@ -11,7 +11,7 @@ Automatic icon resizing for Cordova. Create an icon in the root folder of your C
 
 ### Requirements
 
-- At least one platform was added to your project [http://cordova.apache.org/docs/en/3.4.0/guide_platforms_index.md.html#Platform%20Guides](cordova platforms docs)
+- At least one platform was added to your project ([cordova platforms docs](http://cordova.apache.org/docs/en/3.4.0/guide_platforms_index.md.html#Platform%20Guides))
 - Cordova's build.xml file must exist in the root folder (created by cordova)
 
 ### License
