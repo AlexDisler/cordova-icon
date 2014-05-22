@@ -1,4 +1,3 @@
-cordova-icon
-============
+# Automatic icon resizing for Cordova
 
-Automatic icon generation
+<img src="cordova-icon-resize.png"/>
