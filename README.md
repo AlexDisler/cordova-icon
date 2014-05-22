@@ -6,7 +6,7 @@ Automatic icon resizing for Cordova. Create an icon in the root folder of your C
 
 ### Installation
 
-     npm install cordova-icon
+     npm install cordova-icon -g
 
 ### How to use
 
