@@ -187,7 +187,7 @@ var atLeastOnePlatformFound = function () {
             display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
             deferred.resolve();
         } else {
-            display.error('No cordova platforms found. Add platforms with \'cordova platform add\'');
+            display.error('No cordova platforms found. Make sure you are in the root folder of your Cordova project and add platforms with \'cordova platform add\'');
             deferred.reject();
         }
     });
@@ -234,13 +234,9 @@ var configFileExists = function () {
 
 display.header('Checking Project & Icon');
 
-var prerequisites = [
-    atLeastOnePlatformFound(),
-    validIconExists(),
-    configFileExists(),
-];
-
-Q.all(prerequisites)
+atLeastOnePlatformFound()
+    .then(validIconExists)
+    .then(configFileExists)
     .then(getProjectName)
     .then(getPlatforms)
     .then(generateIcons)
