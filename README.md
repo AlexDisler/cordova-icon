@@ -29,7 +29,7 @@ Paste the following into the hook script:
 
 Then give the script +x permission:
 
-    chmod +x hooks/after_prepare/cordova-icon.sh
+    $ chmod +x hooks/after_prepare/cordova-icon.sh
 
 That's it. Now every time you ```cordova build```, the icons will be auto generated.
 
