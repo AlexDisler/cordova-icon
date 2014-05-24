@@ -16,7 +16,7 @@ Create an ```icon.png``` file in the root folder of your cordova project and run
 
 ### Creating a cordova-cli hook
 
-Since the execution of cordova-icon is pretty fast, you can add it as a cordova-cli to execute before every build.
+Since the execution of cordova-icon is pretty fast, you can add it as a cordova-cli hook to execute before every build.
 To create a new hook, go to your cordova project and run:
 
     $ mkdir hooks/after_prepare
