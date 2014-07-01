@@ -59,8 +59,8 @@ var getPlatforms = function (projectName) {
  * TODO: add option to get these values as CLI params
  */
 var settings = {};
-settings.CONFIG_FILE = 'config.xml';
-settings.ICON_FILE   = 'icon.png';
+settings.CONFIG_FILE = 'www/config.xml';
+settings.ICON_FILE   = 'www/icon.png';
 
 /**
  * @var {Object} console utils
@@ -225,7 +225,7 @@ var configFileExists = function () {
             display.success(settings.CONFIG_FILE + ' exists');
             deferred.resolve();
         } else {
-            dislpay.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist in the root folder');
+            display.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist in the root folder');
             deferred.reject();
         }
     });
