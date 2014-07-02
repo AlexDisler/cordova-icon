@@ -59,8 +59,8 @@ var getPlatforms = function (projectName) {
  * TODO: add option to get these values as CLI params
  */
 var settings = {};
-settings.CONFIG_FILE = 'config.xml';
-settings.ICON_FILE   = 'icon.png';
+settings.CONFIG_FILE = 'www/config.xml';
+settings.ICON_FILE   = 'www/icon.png';
 
 /**
  * @var {Object} console utils
