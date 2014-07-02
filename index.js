@@ -225,7 +225,7 @@ var configFileExists = function () {
             display.success(settings.CONFIG_FILE + ' exists');
             deferred.resolve();
         } else {
-            dislpay.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist in the root folder');
+            display.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist in the root folder');
             deferred.reject();
         }
     });
