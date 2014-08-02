@@ -38,7 +38,7 @@ var getPlatforms = function (projectName) {
         splashesPath : 'platforms/ios/' + projectName + '/Resources/splash/',
         splashes: [
           { name : 'Default-568h@2x~iphone.png',       width : 640, height: 1136 },
-          { name : 'Default-Landscape@2x~ipad.png',  width : 1024, height: 768 },
+          { name : 'Default-Landscape@2x~ipad.png',  width : 2048, height: 1496 },
           { name : 'Default-Landscape~ipad.png',  width : 1024, height: 768 },
           { name : 'Default-Portrait@2x~ipad.png',  width : 1536, height: 2008 },
           { name : 'Default-Portrait~ipad.png', width : 768, height: 1004 },
