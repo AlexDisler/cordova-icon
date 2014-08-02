@@ -2,7 +2,7 @@
 
 <img src="cordova-icon-resize.png"/>
 
-Automatic icon resizing for Cordova. Create an icon in the root folder of your Cordova project and use cordova-icon to automatically resize and copy it for all the platforms your project supports (currenty works with iOS and Android).
+Automatic icon and splashscreen resizing for Cordova. Create an icon and splash screen in the root folder of your Cordova project and use cordova-icon to automatically resize and copy it for all the platforms your project supports (currenty works with iOS and Android).
 
 ### Installation
 
@@ -10,7 +10,7 @@ Automatic icon resizing for Cordova. Create an icon in the root folder of your C
 
 ### Usage
      
-Create an ```icon.png``` file in the www folder of your cordova project and run:
+Create an ```icon.png``` and ```splash.png``` file in the root folder of your cordova project and run:
 
      $ cordova-icon
 
@@ -42,7 +42,7 @@ Install on a Mac:
      $ brew install imagemagick
 
 - At least one platform was added to your project ([cordova platforms docs](http://cordova.apache.org/docs/en/3.4.0/guide_platforms_index.md.html#Platform%20Guides))
-- Cordova's config.xml file must exist in the www folder ([cordova config.xml docs](http://cordova.apache.org/docs/en/3.4.0/config_ref_index.md.html#The%20config.xml%20File))
+- Cordova's config.xml file must exist in the root folder ([cordova config.xml docs](http://cordova.apache.org/docs/en/3.4.0/config_ref_index.md.html#The%20config.xml%20File))
 
 ### License
 
