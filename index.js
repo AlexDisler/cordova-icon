@@ -37,13 +37,13 @@ var getPlatforms = function (projectName) {
         ],
         splashesPath : 'platforms/ios/' + projectName + '/Resources/splash/',
         splashes: [
-          { name : 'Default-568h@2x~iphone.png',       width : 640, height: 1136 },
-          { name : 'Default-Landscape@2x~ipad.png',  width : 2048, height: 1496 },
-          { name : 'Default-Landscape~ipad.png',  width : 1024, height: 768 },
-          { name : 'Default-Portrait@2x~ipad.png',  width : 1536, height: 2008 },
-          { name : 'Default-Portrait~ipad.png', width : 768, height: 1004 },
-          { name : 'Default@2x~iphone.png', width : 640, height: 960 },
-          { name : 'Default~iphone.png', width : 320, height: 480 },
+          { name : 'Default-568h@2x~iphone.png',    width : 640,  height : 1136 },
+          { name : 'Default-Landscape@2x~ipad.png', width : 2048, height : 1496 },
+          { name : 'Default-Landscape~ipad.png',    width : 1024, height : 768  },
+          { name : 'Default-Portrait@2x~ipad.png',  width : 1536, height : 2008 },
+          { name : 'Default-Portrait~ipad.png',     width : 768,  height : 1004 },
+          { name : 'Default@2x~iphone.png',         width : 640,  height : 960  },
+          { name : 'Default~iphone.png',            width : 320,  height : 480  },
         ]
     });
     platforms.push({
@@ -59,11 +59,11 @@ var getPlatforms = function (projectName) {
         ],
         splashesPath : 'platforms/android/res/',
         splashes : [
-            { name : 'drawable/screen.png',       width : 480, height: 640 },
-            { name : 'drawable-hdpi/screen.png',  width : 320, height: 426 },
-            { name : 'drawable-ldpi/screen.png',  width : 320, height: 470 },
-            { name : 'drawable-mdpi/screen.png',  width : 480, height: 640 },
-            { name : 'drawable-xhdpi/screen.png', width : 720, height: 960 },
+            { name : 'drawable/screen.png',       width : 480, height : 640 },
+            { name : 'drawable-hdpi/screen.png',  width : 320, height : 426 },
+            { name : 'drawable-ldpi/screen.png',  width : 320, height : 470 },
+            { name : 'drawable-mdpi/screen.png',  width : 480, height : 640 },
+            { name : 'drawable-xhdpi/screen.png', width : 720, height : 960 },
         ]
     });
     // TODO: add all platforms
