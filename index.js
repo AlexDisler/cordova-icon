@@ -28,9 +28,9 @@ var getPlatforms = function (projectName) {
     platforms.push({
         name : 'ios',
         // TODO: use async fs.exists
-        isAdded : fs.existsSync(iOSRoot),
-        iconsPath : path.join(iOSRoot, projectName, 'Resources/icons'),
-        icons : [
+        isAdded  : fs.existsSync(iOSRoot),
+        iconPath : path.join(iOSRoot, projectName, 'Resources/icons'),
+        iconAssets : [
             { name : 'icon-40.png',       size : 40  },
             { name : 'icon-40@2x.png',    size : 80  },
             { name : 'icon-50.png',       size : 50  },
@@ -48,8 +48,8 @@ var getPlatforms = function (projectName) {
             { name : 'icon.png',          size : 57  },
             { name : 'icon@2x.png',       size : 114 },
         ],
-        splashesPath : 'platforms/ios/' + projectName + '/Resources/splash/',
-        splashes: [
+        splashPath : 'platforms/ios/' + projectName + '/Resources/splash/',
+        splashAssets : [
           { name : 'Default-568h@2x~iphone.png',    width : 640,  height : 1136 },
           { name : 'Default-Landscape@2x~ipad.png', width : 2048, height : 1496 },
           { name : 'Default-Landscape~ipad.png',    width : 1024, height : 768  },
@@ -61,17 +61,17 @@ var getPlatforms = function (projectName) {
     });
     platforms.push({
         name : 'android',
-        iconsPath : path.join(androidRoot, 'res'),
         isAdded : fs.existsSync(androidRoot),
-        icons : [
+        iconPath : path.join(androidRoot, 'res'),
+        iconAssets : [
             { name : 'drawable/icon.png',       size : 96 },
             { name : 'drawable-hdpi/icon.png',  size : 72 },
             { name : 'drawable-ldpi/icon.png',  size : 36 },
             { name : 'drawable-mdpi/icon.png',  size : 48 },
             { name : 'drawable-xhdpi/icon.png', size : 96 },
         ],
-        splashesPath : path.join(androidRoot, 'res'),
-        splashes : [
+        splashPath : path.join(androidRoot, 'res'),
+        splashAssets : [
             { name : 'drawable/screen.png',       width : 480, height : 640 },
             { name : 'drawable-hdpi/screen.png',  width : 320, height : 426 },
             { name : 'drawable-ldpi/screen.png',  width : 320, height : 470 },
@@ -82,9 +82,9 @@ var getPlatforms = function (projectName) {
     // WWW sizing taken from https://mathiasbynens.be/notes/touch-icons#no-html
     platforms.push({
         name : 'www',
-        iconsPath : wwwRoot,
         isAdded : true,
-        icons : [
+        iconPath : wwwRoot,
+        iconAssets : [
             { name : 'apple-touch-icon-57x57-precomposed.png',   width : 57,  height : 57 },
             { name : 'apple-touch-icon-76x76-precomposed.png',   width : 76,  height : 76 },
             { name : 'apple-touch-icon-120x120-precomposed.png', width : 120, height : 120 },
@@ -161,64 +161,86 @@ var getProjectName = function () {
 };
 
 /**
- * Resizes and creates a new icon in the platform's folder.
+ * Resizes and creates a art asset in the platform's folder.
  *
  * @param  {Object} platform
  * @param  {Object} icon
  * @return {Promise}
  */
-var generateIcon = function (platform, icon) {
+var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
     var deferred = Q.defer();
 
     var projectRoot = path.dirname(program.config);
-    var destination = path.resolve(projectRoot, platform.iconsPath);
+    var destination = path.resolve(projectRoot, dstPath);
 
-    ig.resize({
-        srcPath: program.icon,
-        dstPath: path.join(destination, icon.name),
+    var imageMagickOptions = {
+        srcPath: srcPath,
+        dstPath: path.join(destination, artAssetName),
         quality: 1,
-        format: 'png',
-        width: icon.size,
-        height: icon.size,
-    } , function(err, stdout, stderr){
+        format: 'png'
+    };
+
+    ig.resize(_.extend(imageMagickOptions, opts), function (err) {
         if (err) {
             deferred.reject(err);
         } else {
             deferred.resolve();
-            display.success(icon.name + ' created');
+            display.success(artAssetName + ' created');
         }
-    });
+    })
     return deferred.promise;
 };
 
 /**
- * Resizes and creates a new splashscreen in the platform's folder.
+ * Resizes and creates a new icon from a source path to the destination path.
+ *
+ * @param  {Object} platform
+ * @param  {String} srcPath
+ * @param  {String} dstPath
+ * @return {Promise}
+ */
+var generateIcon = function (icon, srcPath, dstPath) {
+    return generateArtAsset(icon.name, srcPath, dstPath, {
+        width: icon.size,
+        height: icon.size
+    });
+};
+
+/**
+ * Resizes and creates a new splash from a source path to the destination path.
  *
  * @param  {Object} platform
  * @param  {Object} icon
  * @return {Promise}
  */
-var generateSplash = function (platform, splash) {
-    var deferred = Q.defer();
-
-    var projectRoot = path.dirname(program.config);
-    var destination = path.resolve(projectRoot, platform.splashesPath);
-
-    ig.resize({
-        srcPath: program.splash,
-        dstPath: path.join(destination, splash.name),
-        quality: 1,
-        format: 'png',
+var generateSplash = function (splash, srcPath, dstPath) {
+    return generateArtAsset(splash.name, srcPath, dstPath, {
         width: splash.width,
-        height: splash.height,
-    } , function(err, stdout, stderr){
-        if (err) {
-            deferred.reject(err);
-        } else {
-            deferred.resolve();
-            display.success(splash.name + ' created');
-        }
+        height: splash.height
     });
+};
+
+/**
+ * Generates all art assets for a given platform and type
+ *
+ * @param {Object} platform
+ * @param {String} type
+ * @param {Function} processor to use, either generateSplash or generateIcon
+ *
+ * @return {Promise}
+ */
+var generateArtAssets = function (platform, type, processor) {
+    var deferred = Q.defer();
+    display.header('Generating ' + type + ' assets for ' + platform.name);
+
+    var processedAssets = platform[type+'Assets'].map(function (asset) {
+        return processor(asset, program[type], platform[type+'Path']);
+    });
+
+    Q.all(processedAssets).then(deferred.resolve).catch(function (err) {
+        console.log(err);
+    });
+
     return deferred.promise;
 };
 
@@ -228,20 +250,8 @@ var generateSplash = function (platform, splash) {
  * @param  {Object} platform
  * @return {Promise}
  */
-var generateIconsForPlatform = function (platform) {
-    var deferred = Q.defer();
-    display.header('Generating Icons for ' + platform.name);
-    var all = [];
-    var icons = platform.icons;
-    icons.forEach(function (icon) {
-        all.push(generateIcon(platform, icon));
-    });
-    Q.all(all).then(function () {
-        deferred.resolve();
-    }).catch(function (err) {
-        console.log(err);
-    });
-    return deferred.promise;
+var generateIcons = function (platform) {
+    return generateArtAssets(platform, 'icon', generateIcon);
 };
 
 /**
@@ -250,20 +260,8 @@ var generateIconsForPlatform = function (platform) {
  * @param  {Object} platform
  * @return {Promise}
  */
-var generateSplashesForPlatform = function (platform) {
-    var deferred = Q.defer();
-    display.header('Generating Splash Screens for ' + platform.name);
-    var all = [];
-    var splashes = platform.splashes;
-    splashes.forEach(function (splash) {
-        all.push(generateSplash(platform, splash));
-    });
-    Q.all(all).then(function () {
-        deferred.resolve();
-    }).catch(function (err) {
-        console.log(err);
-    });
-    return deferred.promise;
+var generateSplashes = function (platform) {
+    return generateArtAssets(platform, 'splash', generateSplash);
 };
 
 /**
@@ -272,20 +270,20 @@ var generateSplashesForPlatform = function (platform) {
  * @param  {Array} platforms
  * @return {Promise}
  */
-var generateIcons = function (platforms) {
+var generate = function (platforms) {
     var deferred = Q.defer();
     var sequence = Q();
     var all = [];
     _(platforms).where({ isAdded : true }).forEach(function (platform) {
         sequence = sequence.then(function () {
-            return generateIconsForPlatform(platform);
+            return generateIcons(platform);
         });
         all.push(sequence);
 
-        if (platform.splashes && platform.splashes.length) {
-          sequence = sequence.then(function () {
-              return generateSplashesForPlatform(platform);
-          });
+        if (platform.splashAssets && platform.splashAssets.length) {
+            sequence = sequence.then(function () {
+                return generateSplashes(platform);
+            });
         }
         all.push(sequence);
     });
@@ -320,63 +318,56 @@ var atLeastOnePlatformFound = function () {
 };
 
 /**
+ * Promise wrapper around fs.exists with option success and error messages for
+ * console output.
+ *
+ * @param {String} location of file to check
+ * @param {String} successMessage
+ * @param {String} errorMessage
+ */
+var validFile = function (location, successMessage, errorMessage) {
+    var deferred = Q.defer();
+
+    successMessage = successMessage || location + ' exists';
+    errorMessage = errorMessage || location + ' does not exist';
+
+    fs.exists(location, function (exists) {
+        if (exists) {
+            display.success(successMessage);
+            deferred.resolve();
+        } else {
+            display.error(errorMessage);
+            deferred.reject();
+        }
+    });
+
+    return deferred.promise;
+};
+
+/**
  * Checks if a valid icon file exists
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var validIconExists = function () {
-    var deferred = Q.defer();
-    fs.exists(program.icon, function (exists) {
-        if (exists) {
-            display.success(program.icon + ' exists');
-            deferred.resolve();
-        } else {
-            display.error(program.icon + ' does not exist');
-            deferred.reject();
-        }
-    });
-    return deferred.promise;
-};
+var validIconExists = validFile.bind(null, program.icon);
 
 /**
  * Checks if a valid splash file exists
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var validSplashExists = function () {
-    var deferred = Q.defer();
-    fs.exists(program.splash, function (exists) {
-        if (exists) {
-            display.success(program.splash + ' exists');
-            deferred.resolve();
-        } else {
-            display.error(program.splash + ' does not exist');
-            deferred.reject();
-        }
-    });
-    return deferred.promise;
-};
+var validSplashExists = validFile.bind(null, program.splash);
 
 /**
  * Checks if a config.xml file exists
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var configFileExists = function () {
-    var deferred = Q.defer();
-    fs.exists(program.config, function (exists) {
-        if (exists) {
-            display.success(program.config + ' exists');
-            deferred.resolve();
-        } else {
-            display.error('cordova\'s ' + program.config + ' does not exist');
-            deferred.reject();
-        }
-    });
-    return deferred.promise;
-};
+var configFileExists = validFile.bind(null, program.config,
+        'cordova\'s ' + program.config + ' exists',
+        'cordova\'s ' + program.config + ' does not exist');
 
-display.header('Checking Project & Icon');
+display.header('Checking Project, Icon, and Splash');
 
 atLeastOnePlatformFound()
     .then(validIconExists)
@@ -384,7 +375,7 @@ atLeastOnePlatformFound()
     .then(configFileExists)
     .then(getProjectName)
     .then(getPlatforms)
-    .then(generateIcons)
+    .then(generate)
     .catch(function (err) {
         if (err) {
             console.log(err);
