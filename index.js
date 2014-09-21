@@ -1,9 +1,12 @@
-var fs     = require('fs');
-var xml2js = require('xml2js');
-var ig     = require('imagemagick');
-var colors = require('colors');
-var _      = require('underscore');
-var Q      = require('q');
+var fs      = require('fs');
+var path    = require('path');
+var xml2js  = require('xml2js');
+var ig      = require('imagemagick');
+var colors  = require('colors');
+var _       = require('underscore');
+var Q       = require('q');
+var program = require('commander');
+var pkginfo = require('./package.json');
 
 /**
  * Check which platforms are added to the project and return their icon names and sized
@@ -12,13 +15,20 @@ var Q      = require('q');
  * @return {Promise} resolves with an array of platforms
  */
 var getPlatforms = function (projectName) {
+    projectName = projectName || '';
+
     var deferred = Q.defer();
     var platforms = [];
+
+    var projectRoot = path.dirname(program.config);
+    var iOSRoot = path.join(projectRoot, 'platforms/ios');
+    var androidRoot = path.join(projectRoot, 'platforms/android');
+
     platforms.push({
         name : 'ios',
         // TODO: use async fs.exists
-        isAdded : fs.existsSync('platforms/ios'),
-        iconsPath : 'platforms/ios/' + projectName + '/Resources/icons/',
+        isAdded : fs.existsSync(iOSRoot),
+        iconsPath : path.join(iOSRoot, projectName, 'Resources/icons'),
         icons : [
             { name : 'icon-40.png',       size : 40  },
             { name : 'icon-40@2x.png',    size : 80  },
@@ -50,8 +60,8 @@ var getPlatforms = function (projectName) {
     });
     platforms.push({
         name : 'android',
-        iconsPath : 'platforms/android/res/',
-        isAdded : fs.existsSync('platforms/android'),
+        iconsPath : path.join(androidRoot, 'res'),
+        isAdded : fs.existsSync(androidRoot),
         icons : [
             { name : 'drawable/icon.png',       size : 96 },
             { name : 'drawable-hdpi/icon.png',  size : 72 },
@@ -59,7 +69,7 @@ var getPlatforms = function (projectName) {
             { name : 'drawable-mdpi/icon.png',  size : 48 },
             { name : 'drawable-xhdpi/icon.png', size : 96 },
         ],
-        splashesPath : 'platforms/android/res/',
+        splashesPath : path.join(androidRoot, 'res'),
         splashes : [
             { name : 'drawable/screen.png',       width : 480, height : 640 },
             { name : 'drawable-hdpi/screen.png',  width : 320, height : 426 },
@@ -73,15 +83,23 @@ var getPlatforms = function (projectName) {
     return deferred.promise;
 };
 
+var resolveWithCWD = function (filePath) {
+    return path.resolve(process.cwd(), filePath);
+};
 
-/**
- * @var {Object} settings - names of the confix file and of the icon image
- * TODO: add option to get these values as CLI params
- */
-var settings = {};
-settings.CONFIG_FILE = 'config.xml';
-settings.ICON_FILE   = 'icon.png';
-settings.SPLASH_FILE   = 'splash.png';
+var defaults = {
+    icon   : resolveWithCWD('icon.png'),
+    splash : resolveWithCWD('splash.png'),
+    config : resolveWithCWD('config.xml'),
+};
+
+// Parse CLI arguments
+program
+    .version(pkginfo.version)
+    .option('-i, --icon [s]',   'Base icon used to generate others', resolveWithCWD, defaults.icon)
+    .option('-s, --splash [s]', 'Base splash screen used to generate others', resolveWithCWD, defaults.splash)
+    .option('-c, --config [s]', 'Cordova configuration file location', resolveWithCWD,  defaults.config)
+    .parse(process.argv);
 
 /**
  * @var {Object} console utils
@@ -109,7 +127,8 @@ display.header = function (str) {
 var getProjectName = function () {
     var deferred = Q.defer();
     var parser = new xml2js.Parser();
-    data = fs.readFile(settings.CONFIG_FILE, function (err, data) {
+
+    fs.readFile(program.config, function (err, data) {
         if (err) {
             deferred.reject(err);
         }
@@ -133,9 +152,13 @@ var getProjectName = function () {
  */
 var generateIcon = function (platform, icon) {
     var deferred = Q.defer();
+
+    var projectRoot = path.dirname(program.config);
+    var destination = path.resolve(projectRoot, platform.iconsPath);
+
     ig.resize({
-        srcPath: settings.ICON_FILE,
-        dstPath: platform.iconsPath + icon.name,
+        srcPath: program.icon,
+        dstPath: path.join(destination, icon.name),
         quality: 1,
         format: 'png',
         width: icon.size,
@@ -160,9 +183,13 @@ var generateIcon = function (platform, icon) {
  */
 var generateSplash = function (platform, splash) {
     var deferred = Q.defer();
+
+    var projectRoot = path.dirname(program.config);
+    var destination = path.resolve(projectRoot, platform.splashesPath);
+
     ig.resize({
-        srcPath: settings.SPLASH_FILE,
-        dstPath: platform.splashesPath + splash.name,
+        srcPath: program.splash,
+        dstPath: path.join(destination, splash.name),
         quality: 1,
         format: 'png',
         width: splash.width,
@@ -261,7 +288,11 @@ var atLeastOnePlatformFound = function () {
             display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
             deferred.resolve();
         } else {
-            display.error('No cordova platforms found. Make sure you are in the root folder of your Cordova project and add platforms with \'cordova platform add\'');
+            display.error(
+                'No Cordova platforms found. Make sure you have specified ' +
+                'the correct config file location (or you\'re in the root ' +
+                'directory of your project) and you\'ve added platforms with' +
+                '\'cordova platform add\'');
             deferred.reject();
         }
     });
@@ -275,12 +306,12 @@ var atLeastOnePlatformFound = function () {
  */
 var validIconExists = function () {
     var deferred = Q.defer();
-    fs.exists(settings.ICON_FILE, function (exists) {
+    fs.exists(program.icon, function (exists) {
         if (exists) {
-            display.success(settings.ICON_FILE + ' exists');
+            display.success(program.icon + ' exists');
             deferred.resolve();
         } else {
-            display.error(settings.ICON_FILE + ' does not exist in the root folder');
+            display.error(program.icon + ' does not exist');
             deferred.reject();
         }
     });
@@ -294,12 +325,12 @@ var validIconExists = function () {
  */
 var validSplashExists = function () {
     var deferred = Q.defer();
-    fs.exists(settings.SPLASH_FILE, function (exists) {
+    fs.exists(program.splash, function (exists) {
         if (exists) {
-            display.success(settings.SPLASH_FILE + ' exists');
+            display.success(program.splash + ' exists');
             deferred.resolve();
         } else {
-            display.error(settings.SPLASH_FILE + ' does not exist in the root folder');
+            display.error(program.splash + ' does not exist');
             deferred.reject();
         }
     });
@@ -313,12 +344,12 @@ var validSplashExists = function () {
  */
 var configFileExists = function () {
     var deferred = Q.defer();
-    fs.exists(settings.CONFIG_FILE, function (exists) {
+    fs.exists(program.config, function (exists) {
         if (exists) {
-            display.success(settings.CONFIG_FILE + ' exists');
+            display.success(program.config + ' exists');
             deferred.resolve();
         } else {
-            display.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist in the root folder');
+            display.error('cordova\'s ' + program.config + ' does not exist');
             deferred.reject();
         }
     });
