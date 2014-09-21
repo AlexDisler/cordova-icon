@@ -21,8 +21,9 @@ var getPlatforms = function (projectName) {
     var platforms = [];
 
     var projectRoot = path.dirname(program.config);
-    var iOSRoot = path.join(projectRoot, 'platforms/ios');
     var androidRoot = path.join(projectRoot, 'platforms/android');
+    var iOSRoot = path.join(projectRoot, 'platforms/ios');
+    var wwwRoot = path.join(projectRoot, 'www');
 
     platforms.push({
         name : 'ios',
@@ -76,6 +77,22 @@ var getPlatforms = function (projectName) {
             { name : 'drawable-ldpi/screen.png',  width : 320, height : 470 },
             { name : 'drawable-mdpi/screen.png',  width : 480, height : 640 },
             { name : 'drawable-xhdpi/screen.png', width : 720, height : 960 },
+        ]
+    });
+    // WWW sizing taken from https://mathiasbynens.be/notes/touch-icons#no-html
+    platforms.push({
+        name : 'www',
+        iconsPath : wwwRoot,
+        isAdded : true,
+        icons : [
+            { name : 'apple-touch-icon-57x57-precomposed.png',   width : 57,  height : 57 },
+            { name : 'apple-touch-icon-76x76-precomposed.png',   width : 76,  height : 76 },
+            { name : 'apple-touch-icon-120x120-precomposed.png', width : 120, height : 120 },
+            { name : 'apple-touch-icon-152x152-precomposed.png', width : 152, height : 152 },
+            { name : 'apple-touch-icon-152x152-precomposed.png', width : 152, height : 152 },
+            { name : 'apple-touch-icon-180x180-precomposed.png', width : 180, height : 180 },
+            { name : 'apple-touch-icon-precomposed.png',         width : 180, height : 180 },
+            { name : 'touch-icon-192x192.png',                   width : 192, height : 192 }
         ]
     });
     // TODO: add all platforms
@@ -264,9 +281,12 @@ var generateIcons = function (platforms) {
             return generateIconsForPlatform(platform);
         });
         all.push(sequence);
-        sequence = sequence.then(function () {
-            return generateSplashesForPlatform(platform);
-        });
+
+        if (platform.splashes && platform.splashes.length) {
+          sequence = sequence.then(function () {
+              return generateSplashesForPlatform(platform);
+          });
+        }
         all.push(sequence);
     });
     Q.all(all).then(function () {
