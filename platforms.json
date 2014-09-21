@@ -1,0 +1,67 @@
+[
+    {
+        "name" : "ios",
+        "iconPath": "$PROJECT_NAME/Resources/icons",
+        "iconAssets" : [
+            { "name" : "icon-40.png",       "size" : 40  },
+            { "name" : "icon-40@2x.png",    "size" : 80  },
+            { "name" : "icon-50.png",       "size" : 50  },
+            { "name" : "icon-50@2x.png",    "size" : 100 },
+            { "name" : "icon-60.png",       "size" : 60  },
+            { "name" : "icon-60@2x.png",    "size" : 120 },
+            { "name" : "icon-60@3x.png",    "size" : 180 },
+            { "name" : "icon-72.png",       "size" : 72  },
+            { "name" : "icon-72@2x.png",    "size" : 144 },
+            { "name" : "icon-76.png",       "size" : 76  },
+            { "name" : "icon-76@2x.png",    "size" : 152 },
+            { "name" : "icon-small.png",    "size" : 29  },
+            { "name" : "icon-small@2x.png", "size" : 58  },
+            { "name" : "icon-small@3x.png", "size" : 87  },
+            { "name" : "icon.png",          "size" : 57  },
+            { "name" : "icon@2x.png",       "size" : 114 }
+        ],
+        "splashPath": "$PROJECT_NAME/Resources/splash",
+        "splashAssets" : [
+          { "name" : "Default-568h@2x~iphone.png",    "width" : 640,  "height" : 1136 },
+          { "name" : "Default-Landscape@2x~ipad.png", "width" : 2048, "height" : 1496 },
+          { "name" : "Default-Landscape~ipad.png",    "width" : 1024, "height" : 768  },
+          { "name" : "Default-Portrait@2x~ipad.png",  "width" : 1536, "height" : 2008 },
+          { "name" : "Default-Portrait~ipad.png",     "width" : 768,  "height" : 1004 },
+          { "name" : "Default@2x~iphone.png",         "width" : 640,  "height" : 960  },
+          { "name" : "Default~iphone.png",            "width" : 320,  "height" : 480  }
+        ]
+    },
+    {
+        "name" : "android",
+        "iconPath": "res",
+        "iconAssets" : [
+            { "name" : "drawable/icon.png",       "size" : 96 },
+            { "name" : "drawable-hdpi/icon.png",  "size" : 72 },
+            { "name" : "drawable-ldpi/icon.png",  "size" : 36 },
+            { "name" : "drawable-mdpi/icon.png",  "size" : 48 },
+            { "name" : "drawable-xhdpi/icon.png", "size" : 96 }
+        ],
+        "splashPath": "res",
+        "splashAssets" : [
+            { "name" : "drawable/screen.png",       "width" : 480, "height" : 640 },
+            { "name" : "drawable-hdpi/screen.png",  "width" : 320, "height" : 426 },
+            { "name" : "drawable-ldpi/screen.png",  "width" : 320, "height" : 470 },
+            { "name" : "drawable-mdpi/screen.png",  "width" : 480, "height" : 640 },
+            { "name" : "drawable-xhdpi/screen.png", "width" : 720, "height" : 960 }
+        ]
+    },
+    {
+        "name" : "www",
+        "iconPath": "",
+        "iconAssets" : [
+            { "name" : "apple-touch-icon-57x57-precomposed.png",   "width" : 57,  "height" : 57 },
+            { "name" : "apple-touch-icon-76x76-precomposed.png",   "width" : 76,  "height" : 76 },
+            { "name" : "apple-touch-icon-120x120-precomposed.png", "width" : 120, "height" : 120 },
+            { "name" : "apple-touch-icon-152x152-precomposed.png", "width" : 152, "height" : 152 },
+            { "name" : "apple-touch-icon-152x152-precomposed.png", "width" : 152, "height" : 152 },
+            { "name" : "apple-touch-icon-180x180-precomposed.png", "width" : 180, "height" : 180 },
+            { "name" : "apple-touch-icon-precomposed.png",         "width" : 180, "height" : 180 },
+            { "name" : "touch-icon-192x192.png",                   "width" : 192, "height" : 192 }
+        ]
+    }
+]

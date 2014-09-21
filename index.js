@@ -6,7 +6,15 @@ var colors  = require('colors');
 var _       = require('underscore');
 var Q       = require('q');
 var program = require('commander');
-var pkginfo = require('./package.json');
+
+var packageInfo  = require('./package.json');
+var platformInfo = require('./platforms.json');
+
+var rootDirectories = {
+    android: 'platforms/android',
+    ios: 'platforms/ios',
+    www: 'www'
+};
 
 /**
  * Check which platforms are added to the project and return their icon names and sized
@@ -20,84 +28,31 @@ var getPlatforms = function (projectName) {
     var deferred = Q.defer();
     var platforms = [];
 
-    var projectRoot = path.dirname(program.config);
-    var androidRoot = path.join(projectRoot, 'platforms/android');
-    var iOSRoot = path.join(projectRoot, 'platforms/ios');
-    var wwwRoot = path.join(projectRoot, 'www');
+    var projectRoot  = path.dirname(program.config);
 
-    platforms.push({
-        name : 'ios',
-        // TODO: use async fs.exists
-        isAdded  : fs.existsSync(iOSRoot),
-        iconPath : path.join(iOSRoot, projectName, 'Resources/icons'),
-        iconAssets : [
-            { name : 'icon-40.png',       size : 40  },
-            { name : 'icon-40@2x.png',    size : 80  },
-            { name : 'icon-50.png',       size : 50  },
-            { name : 'icon-50@2x.png',    size : 100 },
-            { name : 'icon-60.png',       size : 60  },
-            { name : 'icon-60@2x.png',    size : 120 },
-            { name : 'icon-60@3x.png',    size : 180 },
-            { name : 'icon-72.png',       size : 72  },
-            { name : 'icon-72@2x.png',    size : 144 },
-            { name : 'icon-76.png',       size : 76  },
-            { name : 'icon-76@2x.png',    size : 152 },
-            { name : 'icon-small.png',    size : 29  },
-            { name : 'icon-small@2x.png', size : 58  },
-            { name : 'icon-small@3x.png', size : 87  },
-            { name : 'icon.png',          size : 57  },
-            { name : 'icon@2x.png',       size : 114 },
-        ],
-        splashPath : 'platforms/ios/' + projectName + '/Resources/splash/',
-        splashAssets : [
-          { name : 'Default-568h@2x~iphone.png',    width : 640,  height : 1136 },
-          { name : 'Default-Landscape@2x~ipad.png', width : 2048, height : 1496 },
-          { name : 'Default-Landscape~ipad.png',    width : 1024, height : 768  },
-          { name : 'Default-Portrait@2x~ipad.png',  width : 1536, height : 2008 },
-          { name : 'Default-Portrait~ipad.png',     width : 768,  height : 1004 },
-          { name : 'Default@2x~iphone.png',         width : 640,  height : 960  },
-          { name : 'Default~iphone.png',            width : 320,  height : 480  },
-        ]
-    });
-    platforms.push({
-        name : 'android',
-        isAdded : fs.existsSync(androidRoot),
-        iconPath : path.join(androidRoot, 'res'),
-        iconAssets : [
-            { name : 'drawable/icon.png',       size : 96 },
-            { name : 'drawable-hdpi/icon.png',  size : 72 },
-            { name : 'drawable-ldpi/icon.png',  size : 36 },
-            { name : 'drawable-mdpi/icon.png',  size : 48 },
-            { name : 'drawable-xhdpi/icon.png', size : 96 },
-        ],
-        splashPath : path.join(androidRoot, 'res'),
-        splashAssets : [
-            { name : 'drawable/screen.png',       width : 480, height : 640 },
-            { name : 'drawable-hdpi/screen.png',  width : 320, height : 426 },
-            { name : 'drawable-ldpi/screen.png',  width : 320, height : 470 },
-            { name : 'drawable-mdpi/screen.png',  width : 480, height : 640 },
-            { name : 'drawable-xhdpi/screen.png', width : 720, height : 960 },
-        ]
-    });
-    // WWW sizing taken from https://mathiasbynens.be/notes/touch-icons#no-html
-    platforms.push({
-        name : 'www',
-        isAdded : true,
-        iconPath : wwwRoot,
-        iconAssets : [
-            { name : 'apple-touch-icon-57x57-precomposed.png',   width : 57,  height : 57 },
-            { name : 'apple-touch-icon-76x76-precomposed.png',   width : 76,  height : 76 },
-            { name : 'apple-touch-icon-120x120-precomposed.png', width : 120, height : 120 },
-            { name : 'apple-touch-icon-152x152-precomposed.png', width : 152, height : 152 },
-            { name : 'apple-touch-icon-152x152-precomposed.png', width : 152, height : 152 },
-            { name : 'apple-touch-icon-180x180-precomposed.png', width : 180, height : 180 },
-            { name : 'apple-touch-icon-precomposed.png',         width : 180, height : 180 },
-            { name : 'touch-icon-192x192.png',                   width : 192, height : 192 }
-        ]
-    });
     // TODO: add all platforms
+    var platforms = platformInfo.map(function(platform) {
+        var platformRoot = rootDirectories[platform.name];
+        var platformPath = path.join(projectRoot, platformRoot);
+
+        var iconPath   = processPath(platform.iconPath || '', projectName);
+        var splashPath = processPath(platform.splashPath || '', projectName);
+
+        return _.extend(Object.create(platform), {
+            iconPath: path.join(platformPath, iconPath),
+            splashPath: path.join(platformPath, splashPath),
+
+            isAdded: fs.existsSync(platformPath)
+        });
+    });
+
     deferred.resolve(platforms);
     return deferred.promise;
+};
+
+var projectNameRE = /\$PROJECT_NAME/g;
+var processPath = function (path, projectName) {
+  return path.replace(projectNameRE, projectName);
 };
 
 var resolveWithCWD = function (filePath) {
@@ -112,7 +67,7 @@ var defaults = {
 
 // Parse CLI arguments
 program
-    .version(pkginfo.version)
+    .version(packageInfo.version)
     .option('-i, --icon [s]',   'Base icon used to generate others', resolveWithCWD, defaults.icon)
     .option('-s, --splash [s]', 'Base splash screen used to generate others', resolveWithCWD, defaults.splash)
     .option('-c, --config [s]', 'Cordova configuration file location', resolveWithCWD,  defaults.config)
