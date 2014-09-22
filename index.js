@@ -25,29 +25,28 @@ var rootDirectories = {
 var getPlatforms = function (projectName) {
     projectName = projectName || '';
 
-    var deferred = Q.defer();
     var platforms = [];
-
-    var projectRoot  = path.dirname(program.config);
+    var projectRoot = path.dirname(program.config);
 
     // TODO: add all platforms
-    var platforms = platformInfo.map(function(platform) {
+    var platforms = Q.all(platformInfo.map(function(platform) {
         var platformRoot = rootDirectories[platform.name];
         var platformPath = path.join(projectRoot, platformRoot);
 
         var iconPath   = processPath(platform.iconPath || '', projectName);
         var splashPath = processPath(platform.splashPath || '', projectName);
 
-        return _.extend(Object.create(platform), {
-            iconPath: path.join(platformPath, iconPath),
-            splashPath: path.join(platformPath, splashPath),
+        return Q.nfcall(fs.stat, platformPath).then(function(stat) {
+            return _.extend(Object.create(platform), {
+                isAdded: stat.isDirectory(),
 
-            isAdded: fs.existsSync(platformPath)
+                iconPath: path.join(platformPath, iconPath),
+                splashPath: path.join(platformPath, splashPath)
+            });
         });
-    });
+    }));
 
-    deferred.resolve(platforms);
-    return deferred.promise;
+    return platforms;
 };
 
 var projectNameRE = /\$PROJECT_NAME/g;
