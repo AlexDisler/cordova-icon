@@ -85,6 +85,10 @@ display.error = function (str) {
     str = '✗  '.red + str;
     console.log('  ' + str);
 };
+display.warn = function (str) {
+    str = '  ⚠  '.yellow + str;
+    console.log(str);
+};
 display.header = function (str) {
     console.log('');
     console.log(' ' + str.cyan.underline);
@@ -229,18 +233,23 @@ var generate = function (platforms) {
     var deferred = Q.defer();
     var sequence = Q();
     var all = [];
-    _(platforms).where({ isAdded : true }).forEach(function (platform) {
-        sequence = sequence.then(function () {
-            return generateIcons(platform);
-        });
-        all.push(sequence);
 
-        if (platform.splashAssets && platform.splashAssets.length) {
+    _(platforms).where({ isAdded : true }).forEach(function (platform) {
+        if (program.icon && platform.iconAssets && platform.iconAssets.length) {
+            sequence = sequence.then(function () {
+                return generateIcons(platform);
+            });
+
+            all.push(sequence);
+        }
+
+        if (program.splash && platform.splashAssets && platform.splashAssets.length) {
             sequence = sequence.then(function () {
                 return generateSplashes(platform);
             });
+
+            all.push(sequence);
         }
-        all.push(sequence);
     });
     Q.all(all).then(function () {
         deferred.resolve();
@@ -261,15 +270,24 @@ var atLeastOnePlatformFound = function () {
             display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
             deferred.resolve();
         } else {
-            display.error(
+            deferred.reject(
                 'No Cordova platforms found. Make sure you have specified ' +
                 'the correct config file location (or you\'re in the root ' +
-                'directory of your project) and you\'ve added platforms with' +
-                '\'cordova platform add\'');
-            deferred.reject();
+                'directory of your project) and you\'ve added platforms ' +
+                'with \'cordova platform add\'');
         }
     });
     return deferred.promise;
+};
+
+
+var atLeastOneAssetType = function () {
+    try {
+      return program.icon || program.splash ? Q.resolve() : Q.reject(
+              "At least one asset type should be specified");
+    } catch (e) {
+        console.log(e.message);
+    }
 };
 
 /**
@@ -280,15 +298,21 @@ var atLeastOnePlatformFound = function () {
  * @param {String} successMessage
  * @param {String} errorMessage
  */
-var validFile = function (location, successMessage, errorMessage) {
+var validParamFile = function (type, successMessage, errorMessage, warnMessage) {
     var deferred = Q.defer();
+    var location = program[type];
 
-    successMessage = successMessage || location + ' exists';
-    errorMessage = errorMessage || location + ' does not exist';
+    successMessage = successMessage || type + ' asset exists at: ' + location;
+    errorMessage = errorMessage || type + ' asset doesn\'t exist at: ' + location;
+    warnMessage = warnMessage || type + ' asset was not specified';
 
     fs.exists(location, function (exists) {
         if (exists) {
             display.success(successMessage);
+            deferred.resolve();
+        } else if (location === defaults[type] && type !== 'config') {
+            program[type] = null;
+            display.warn(warnMessage);
             deferred.resolve();
         } else {
             display.error(errorMessage);
@@ -304,21 +328,21 @@ var validFile = function (location, successMessage, errorMessage) {
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var validIconExists = validFile.bind(null, program.icon);
+var validIconExists = validParamFile.bind(null, 'icon');
 
 /**
  * Checks if a valid splash file exists
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var validSplashExists = validFile.bind(null, program.splash);
+var validSplashExists = validParamFile.bind(null, 'splash');
 
 /**
  * Checks if a config.xml file exists
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var configFileExists = validFile.bind(null, program.config,
+var configFileExists = validParamFile.bind(null, 'config',
         'cordova\'s ' + program.config + ' exists',
         'cordova\'s ' + program.config + ' does not exist');
 
@@ -327,13 +351,14 @@ display.header('Checking Project, Icon, and Splash');
 atLeastOnePlatformFound()
     .then(validIconExists)
     .then(validSplashExists)
+    .then(atLeastOneAssetType)
     .then(configFileExists)
     .then(getProjectName)
     .then(getPlatforms)
     .then(generate)
     .catch(function (err) {
         if (err) {
-            console.log(err);
+            display.error(err);
         }
     }).then(function () {
         console.log('');
