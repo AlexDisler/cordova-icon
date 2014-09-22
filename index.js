@@ -29,7 +29,7 @@ var getPlatforms = function (projectName) {
     var projectRoot = path.dirname(program.config);
 
     // TODO: add all platforms
-    var platforms = Q.all(platformInfo.map(function(platform) {
+    var platforms = platformInfo.map(function(platform) {
         var platformRoot = rootDirectories[platform.name];
         var platformPath = path.join(projectRoot, platformRoot);
 
@@ -44,9 +44,9 @@ var getPlatforms = function (projectName) {
                 splashPath: path.join(platformPath, splashPath)
             });
         });
-    }));
+    });
 
-    return platforms;
+    return Q.all(platforms);
 };
 
 var projectNameRE = /\$PROJECT_NAME/g;
@@ -103,19 +103,13 @@ var getProjectName = function () {
     var deferred = Q.defer();
     var parser = new xml2js.Parser();
 
-    fs.readFile(program.config, function (err, data) {
-        if (err) {
-            deferred.reject(err);
-        }
-        parser.parseString(data, function (err, result) {
-            if (err) {
-                deferred.reject(err);
-            }
-            var projectName = result.widget.name[0];
-            deferred.resolve(projectName);
+    return Q.nfcall(fs.readFile, program.config)
+        .then(function(data) {
+            return Q.ninvoke(parser, 'parseString', data);
+        })
+        .then(function(result) {
+            return result.widget.name[0];
         });
-    });
-    return deferred.promise;
 };
 
 /**
@@ -126,8 +120,6 @@ var getProjectName = function () {
  * @return {Promise}
  */
 var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
-    var deferred = Q.defer();
-
     var projectRoot = path.dirname(program.config);
     var destination = path.resolve(projectRoot, dstPath);
 
@@ -138,15 +130,10 @@ var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
         format: 'png'
     };
 
-    ig.resize(_.extend(imageMagickOptions, opts), function (err) {
-        if (err) {
-            deferred.reject(err);
-        } else {
-            deferred.resolve();
+    return Q.ninvoke(ig, 'resize', _.extend(imageMagickOptions, opts))
+        .then(function() {
             display.success(artAssetName + ' created');
-        }
-    })
-    return deferred.promise;
+        });
 };
 
 /**
@@ -188,18 +175,13 @@ var generateSplash = function (splash, srcPath, dstPath) {
  * @return {Promise}
  */
 var generateArtAssets = function (platform, type, processor) {
-    var deferred = Q.defer();
     display.header('Generating ' + type + ' assets for ' + platform.name);
 
-    var processedAssets = platform[type+'Assets'].map(function (asset) {
-        return processor(asset, program[type], platform[type+'Path']);
-    });
-
-    Q.all(processedAssets).then(deferred.resolve).catch(function (err) {
-        console.log(err);
-    });
-
-    return deferred.promise;
+    return platform[type+'Assets'].reduce(function (previous, asset) {
+        return previous.then(function () {
+            return processor(asset, program[type], platform[type+'Path']);
+        })
+    }, Q());
 };
 
 /**
@@ -229,31 +211,23 @@ var generateSplashes = function (platform) {
  * @return {Promise}
  */
 var generate = function (platforms) {
-    var deferred = Q.defer();
-    var sequence = Q();
-    var all = [];
+    var tasks = _(platforms).where({ isAdded : true }).reduce(function (previous, platform) {
+        return previous.then(function() {
+            return Q()
+                .then(processPlatformFor.bind(null, 'icon', platform, generateIcons))
+                .then(processPlatformFor.bind(null, 'splash', platform, generateSplashes));
+        })
+    }, Q());
 
-    _(platforms).where({ isAdded : true }).forEach(function (platform) {
-        if (program.icon && platform.iconAssets && platform.iconAssets.length) {
-            sequence = sequence.then(function () {
-                return generateIcons(platform);
-            });
+    return tasks;
 
-            all.push(sequence);
+    function processPlatformFor(type, platform, processor) {
+        var assets = platform[type+'Assets'] || [];
+
+        if (program[type] && assets.length) {
+            return processor(platform);
         }
-
-        if (program.splash && platform.splashAssets && platform.splashAssets.length) {
-            sequence = sequence.then(function () {
-                return generateSplashes(platform);
-            });
-
-            all.push(sequence);
-        }
-    });
-    Q.all(all).then(function () {
-        deferred.resolve();
-    });
-    return deferred.promise;
+    }
 };
 
 /**
@@ -262,31 +236,19 @@ var generate = function (platforms) {
  * @return {Promise} resolves if at least one platform was found, rejects otherwise
  */
 var atLeastOnePlatformFound = function () {
-    var deferred = Q.defer();
-    getPlatforms().then(function (platforms) {
+    return getPlatforms().then(function (platforms) {
         var activePlatforms = _(platforms).where({ isAdded : true });
-        if (activePlatforms.length > 0) {
-            display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
-            deferred.resolve();
-        } else {
-            deferred.reject(
+
+        if (activePlatforms.length === 0) {
+            throw new Error(
                 'No Cordova platforms found. Make sure you have specified ' +
                 'the correct config file location (or you\'re in the root ' +
                 'directory of your project) and you\'ve added platforms ' +
                 'with \'cordova platform add\'');
-        }
+        } 
+
+        display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
     });
-    return deferred.promise;
-};
-
-
-var atLeastOneAssetType = function () {
-    try {
-      return program.icon || program.splash ? Q.resolve() : Q.reject(
-              "At least one asset type should be specified");
-    } catch (e) {
-        console.log(e.message);
-    }
 };
 
 /**
@@ -296,30 +258,35 @@ var atLeastOneAssetType = function () {
  * @param {String} location of file to check
  * @param {String} successMessage
  * @param {String} errorMessage
+ * @return {Promise} resolves to boolean indicating whether the file exists
  */
-var validParamFile = function (type, successMessage, errorMessage, warnMessage) {
-    var deferred = Q.defer();
+var validParamFile = function (type, warningType, successMessage, errorMessage, warnMessage) {
     var location = program[type];
 
     successMessage = successMessage || type + ' asset exists at: ' + location;
     errorMessage = errorMessage || type + ' asset doesn\'t exist at: ' + location;
     warnMessage = warnMessage || type + ' asset was not specified';
 
-    fs.exists(location, function (exists) {
-        if (exists) {
+    return Q.nfcall(fs.readFile, location)
+        .then(function() {
             display.success(successMessage);
-            deferred.resolve();
-        } else if (location === defaults[type] && type !== 'config') {
-            program[type] = null;
-            display.warn(warnMessage);
-            deferred.resolve();
-        } else {
-            display.error(errorMessage);
-            deferred.reject();
-        }
-    });
+            return true;
+        })
+        .catch(function(error) {
+            if (warningType) {
+                program[type] = null;
+                display.warn(warnMessage);
+                return true;
+            }
 
-    return deferred.promise;
+            // No file exists, return false
+            if (error.code === 'ENOENT') {
+                return false;
+            }
+
+            // Throw unknown error
+            throw error;
+        })
 };
 
 /**
@@ -327,38 +294,52 @@ var validParamFile = function (type, successMessage, errorMessage, warnMessage) 
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var validIconExists = validParamFile.bind(null, 'icon');
+var validIconExists = validParamFile.bind(null, 'icon', true);
 
 /**
  * Checks if a valid splash file exists
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var validSplashExists = validParamFile.bind(null, 'splash');
+var validSplashExists = validParamFile.bind(null, 'splash', true);
+
+/**
+ * Ensures we either have a valid splash asset or a valid icon asset
+ *
+ * @return {Promise}
+ * @throws {Error}
+ */
+var validArtAssets = function() {
+    Q.all([validIconExists(), validSplashExists()])
+        .spread(function (validIcon, validSplash) {
+            if (!validIcon && !validSplash)
+                throw new Error('At least one asset type should be specified');
+        });
+};
 
 /**
  * Checks if a config.xml file exists
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var configFileExists = validParamFile.bind(null, 'config',
+var configFileExists = validParamFile.bind(null, 'config', false,
         'cordova\'s ' + program.config + ' exists',
         'cordova\'s ' + program.config + ' does not exist');
+
 
 display.header('Checking Project, Icon, and Splash');
 
 atLeastOnePlatformFound()
-    .then(validIconExists)
-    .then(validSplashExists)
-    .then(atLeastOneAssetType)
     .then(configFileExists)
+    .then(validArtAssets)
     .then(getProjectName)
     .then(getPlatforms)
     .then(generate)
     .catch(function (err) {
         if (err) {
-            display.error(err);
+            display.error(err.message);
         }
     }).then(function () {
         console.log('');
     });
+
