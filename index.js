@@ -25,7 +25,6 @@ var rootDirectories = {
 var getPlatforms = function (projectName) {
     projectName = projectName || '';
 
-    var platforms = [];
     var projectRoot = path.dirname(program.config);
 
     // TODO: add all platforms
