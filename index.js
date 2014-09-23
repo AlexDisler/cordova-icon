@@ -12,6 +12,7 @@ var platformInfo = require('./platforms.json');
 
 var rootDirectories = {
     android: 'platforms/android',
+    blackberry: 'platforms/bb10',
     ios: 'platforms/ios',
     www: 'www'
 };
@@ -176,11 +177,9 @@ var generateSplash = function (splash, srcPath, dstPath) {
 var generateArtAssets = function (platform, type, processor) {
     display.header('Generating ' + type + ' assets for ' + platform.name);
 
-    return platform[type+'Assets'].reduce(function (previous, asset) {
-        return previous.then(function () {
-            return processor(asset, program[type], platform[type+'Path']);
-        })
-    }, Q());
+    return Q.all(platform[type+'Assets'].map(function(asset) {
+      return processor(asset, program[type], platform[type+'Path']);
+    }));
 };
 
 /**
