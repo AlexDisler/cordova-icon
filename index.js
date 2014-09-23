@@ -1,7 +1,7 @@
 var fs      = require('fs');
 var path    = require('path');
 var xml2js  = require('xml2js');
-var ig      = require('imagemagick');
+var gm      = require('gm');
 var colors  = require('colors');
 var _       = require('underscore');
 var Q       = require('q');
@@ -61,7 +61,7 @@ var resolveWithCWD = function (filePath) {
 var defaults = {
     icon   : resolveWithCWD('icon.png'),
     splash : resolveWithCWD('splash.png'),
-    config : resolveWithCWD('config.xml'),
+    config : resolveWithCWD('config.xml')
 };
 
 // Parse CLI arguments
@@ -70,6 +70,7 @@ program
     .option('-i, --icon [s]',   'Base icon used to generate others', resolveWithCWD, defaults.icon)
     .option('-s, --splash [s]', 'Base splash screen used to generate others', resolveWithCWD, defaults.splash)
     .option('-c, --config [s]', 'Cordova configuration file location', resolveWithCWD,  defaults.config)
+    .option('-b, --background [s]', 'Background to use for icon', resolveWithCWD, null)
     .parse(process.argv);
 
 /**
@@ -121,19 +122,30 @@ var getProjectName = function () {
  */
 var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
     var projectRoot = path.dirname(program.config);
-    var destination = path.resolve(projectRoot, dstPath);
+    var destination = path.resolve(projectRoot, dstPath, artAssetName);
 
-    var imageMagickOptions = {
-        srcPath: srcPath,
-        dstPath: path.join(destination, artAssetName),
-        quality: 1,
-        format: 'png'
-    };
+    var width  = opts.width ? opts.width : opts.size;
+    var height = opts.height ? opts.height : opts.size;
 
-    return Q.ninvoke(ig, 'resize', _.extend(imageMagickOptions, opts))
-        .then(function() {
-            display.success(artAssetName + ' created');
-        });
+    var image;
+
+    // Some images have backgrounds that need to be composed in
+    if (Array.isArray(srcPath)) {
+        image = gm()
+        image = image
+            .options({ imageMagick: true })
+            .command('composite')
+            .in.apply(image, srcPath);
+    }
+    else {
+        image = gm(srcPath).options({ imageMagick: true });
+    }
+
+    image = image.resize(width, height);
+
+    return Q.ninvoke(image, 'write', destination).then(function() {
+        display.success(artAssetName + ' created');
+    });
 };
 
 /**
@@ -142,6 +154,7 @@ var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
  * @param  {Object} platform
  * @param  {String} srcPath
  * @param  {String} dstPath
+ * @param  {String} bgPath
  * @return {Promise}
  */
 var generateIcon = function (icon, srcPath, dstPath) {
@@ -169,16 +182,20 @@ var generateSplash = function (splash, srcPath, dstPath) {
  * Generates all art assets for a given platform and type
  *
  * @param {Object} platform
- * @param {String} type
+ * @param {String} type indicator of 'icon' or 'splash'
+ * @param {String} srcPath absolute path of source art asset
  * @param {Function} processor to use, either generateSplash or generateIcon
  *
  * @return {Promise}
  */
-var generateArtAssets = function (platform, type, processor) {
+var generateArtAssets = function (platform, type, processor, srcPath) {
     display.header('Generating ' + type + ' assets for ' + platform.name);
+    srcPath = srcPath || program[type];
 
     return Q.all(platform[type+'Assets'].map(function(asset) {
-      return processor(asset, program[type], platform[type+'Path']);
+        var outPath = platform[type+'Path'];
+
+        return processor(asset, srcPath, outPath);
     }));
 };
 
@@ -189,7 +206,12 @@ var generateArtAssets = function (platform, type, processor) {
  * @return {Promise}
  */
 var generateIcons = function (platform) {
-    return generateArtAssets(platform, 'icon', generateIcon);
+    // Use a background if we have one and the platform has it set
+    if (platform.iconBackground && program.background) {
+        var srcPath = [ program.icon, program.background ];
+    }
+
+    return generateArtAssets(platform, 'icon', generateIcon, srcPath);
 };
 
 /**

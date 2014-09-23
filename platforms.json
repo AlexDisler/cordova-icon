@@ -1,6 +1,7 @@
 [
     {
         "name" : "ios",
+        "iconBackground" : true,
         "iconPath": "$PROJECT_NAME/Resources/icons",
         "iconAssets" : [
             { "name" : "icon-40.png",       "size" : 40  },
