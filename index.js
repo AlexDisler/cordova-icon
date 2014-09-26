@@ -18,7 +18,9 @@ var rootDirectories = {
 };
 
 /**
- * Check which platforms are added to the project and return their icon names and sized
+ * Check which platforms are added to the project and return their information.
+ *
+ * TODO: add all platforms
  *
  * @param  {String} projectName
  * @return {Promise} resolves with an array of platforms
@@ -28,7 +30,6 @@ var getPlatforms = function (projectName) {
 
     var projectRoot = path.dirname(program.config);
 
-    // TODO: add all platforms
     var platforms = platformInfo.map(function(platform) {
         var platformRoot = rootDirectories[platform.name];
         var platformPath = path.join(projectRoot, platformRoot);
@@ -96,7 +97,7 @@ display.header = function (str) {
 };
 
 /**
- * read the config file and get the project name
+ * Read the config file and get the project name
  *
  * @return {Promise} resolves to a string - the project's name
  */
@@ -114,10 +115,13 @@ var getProjectName = function () {
 };
 
 /**
- * Resizes and creates a art asset in the platform's folder.
+ * Resizes and creates a art asset in the platform's folder by using
+ * GraphicsMagick.
  *
- * @param  {Object} platform
- * @param  {Object} icon
+ * @param  {String} artAssetName
+ * @param  {String} srcPath
+ * @param  {String} dstPath
+ * @param  {Object} opts for width, height, and size
  * @return {Promise}
  */
 var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
@@ -225,7 +229,7 @@ var generateSplashes = function (platform) {
 };
 
 /**
- * Goes over all the platforms and triggers icon generation
+ * Goes over all the platforms and triggers icon/splash generation
  * 
  * @param  {Array} platforms
  * @return {Promise}
@@ -251,8 +255,9 @@ var generate = function (platforms) {
 };
 
 /**
- * Checks if at least one platform was added to the project
+ * Ensures at least one platform was added to the project
  *
+ * @throws {Error}
  * @return {Promise} resolves if at least one platform was found, rejects otherwise
  */
 var atLeastOnePlatformFound = function () {
@@ -272,12 +277,14 @@ var atLeastOnePlatformFound = function () {
 };
 
 /**
- * Promise wrapper around fs.exists with option success and error messages for
- * console output.
+ * Checks if the passed asset type (icon, splash, or config) exists, if it
+ * doesn't then we optionally generate a warning.
  *
- * @param {String} location of file to check
+ * @param {String} type (icon, splash, or config)
+ * @param {Boolean} warningType allows non existent files to pass through and only warn
  * @param {String} successMessage
  * @param {String} errorMessage
+ * @param {String} warnMessage
  * @return {Promise} resolves to boolean indicating whether the file exists
  */
 var validParamFile = function (type, warningType, successMessage, errorMessage, warnMessage) {
@@ -312,14 +319,14 @@ var validParamFile = function (type, warningType, successMessage, errorMessage, 
 /**
  * Checks if a valid icon file exists
  *
- * @return {Promise} resolves if exists, rejects otherwise
+ * @return {Promise} resolves to a boolean incidating whether it exists
  */
 var validIconExists = validParamFile.bind(null, 'icon', true);
 
 /**
  * Checks if a valid splash file exists
  *
- * @return {Promise} resolves if exists, rejects otherwise
+ * @return {Promise} resolves to a boolean incidating whether it exists
  */
 var validSplashExists = validParamFile.bind(null, 'splash', true);
 
