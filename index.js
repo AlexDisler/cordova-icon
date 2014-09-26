@@ -145,7 +145,7 @@ var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
         image = gm(srcPath).options({ imageMagick: true });
     }
 
-    image = image.resize(width, height);
+    image = image.resize(width, height, '!');
 
     return Q.ninvoke(image, 'write', destination).then(function() {
         display.success(artAssetName + ' created');
