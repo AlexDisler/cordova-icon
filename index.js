@@ -6,6 +6,8 @@ var colors  = require('colors');
 var _       = require('underscore');
 var Q       = require('q');
 var program = require('commander');
+var phantom = require('phantomjs');
+var exec    = require('child_process').execFile;
 
 var packageInfo  = require('./package.json');
 var platformInfo = require('./platforms.json');
@@ -70,7 +72,7 @@ program
     .version(packageInfo.version)
     .option('-i, --icon [s]',   'Base icon used to generate others', resolveWithCWD, defaults.icon)
     .option('-s, --splash [s]', 'Base splash screen used to generate others', resolveWithCWD, defaults.splash)
-    .option('-c, --config [s]', 'Cordova configuration file location', resolveWithCWD,  defaults.config)
+    .option('-c, --config [s]', 'Cordova configuration file location, used as the root of your project', resolveWithCWD,  defaults.config)
     .option('-b, --background [s]', 'Background to use for icon', resolveWithCWD, null)
     .parse(process.argv);
 
@@ -124,7 +126,7 @@ var getProjectName = function () {
  * @param  {Object} opts for width, height, and size
  * @return {Promise}
  */
-var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
+var generateRasterArtAsset = function (artAssetName, srcPath, dstPath, opts) {
     var projectRoot = path.dirname(program.config);
     var destination = path.resolve(projectRoot, dstPath, artAssetName);
 
@@ -153,6 +155,28 @@ var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
 };
 
 /**
+ * Creates an art asset from an HTML file using PhantomJS to render it.
+ *
+ * @param  {String} artAssetName
+ * @param  {String} srcPath
+ * @param  {String} dstPath
+ * @param  {Object} opts for width, height, and size
+ * @return {Promise}
+ */
+var generateHTMLArtAsset = function (artAssetName, srcPath, dstPath, opts) {
+    var scriptPath = path.join(__dirname, 'phantomjs-rasterize.js');
+    var outPath = path.join(dstPath, artAssetName);
+    var width = opts.size || opts.width;
+    var height = opts.size || opts.height;
+
+    var args = [ scriptPath, srcPath, outPath, width, height ];
+
+    return Q.nfcall(exec, phantom.path, args).then(function() {
+        display.success(artAssetName + ' created');
+    });
+};
+
+/**
  * Resizes and creates a new icon from a source path to the destination path.
  *
  * @param  {Object} platform
@@ -162,10 +186,16 @@ var generateArtAsset = function (artAssetName, srcPath, dstPath, opts) {
  * @return {Promise}
  */
 var generateIcon = function (icon, srcPath, dstPath) {
-    return generateArtAsset(icon.name, srcPath, dstPath, {
+    var processor = path.extname(srcPath) === '.html'
+        ? generateHTMLArtAsset
+        : generateRasterArtAsset;
+
+    var opts = {
         width: icon.size,
         height: icon.size
-    });
+    };
+
+    return processor(icon.name, srcPath, dstPath, opts);
 };
 
 /**
@@ -176,10 +206,16 @@ var generateIcon = function (icon, srcPath, dstPath) {
  * @return {Promise}
  */
 var generateSplash = function (splash, srcPath, dstPath) {
-    return generateArtAsset(splash.name, srcPath, dstPath, {
+    var processor = path.extname(srcPath) === '.html'
+        ? generateHTMLArtAsset
+        : generateRasterArtAsset;
+
+    var opts = {
         width: splash.width,
         height: splash.height
-    });
+    };
+
+    return processor(splash.name, srcPath, dstPath, opts);
 };
 
 /**
