@@ -57,7 +57,7 @@ var getPlatforms = function (projectName) {
 
 var projectNameRE = /\$PROJECT_NAME/g;
 var processPath = function (path, projectName) {
-  return path.replace(projectNameRE, projectName);
+    return path.replace(projectNameRE, projectName);
 };
 
 var resolveWithCWD = function (filePath) {
