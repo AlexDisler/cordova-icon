@@ -21,7 +21,7 @@ Create an ```icon.png``` and/or ```splash.png``` file in the root folder of your
     -i, --icon [s]        Base icon used to generate others
     -s, --splash [s]      Base splash screen used to generate others
     -c, --config [s]      Cordova configuration file location, used as the root of your project
-    -b, --background [s]  Background to use for icon
+    -b, --background [s]  Background to use for icon on platforms that typically have one
 
 ### HTML Art Asset File Generation
 
