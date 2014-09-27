@@ -14,7 +14,6 @@ var platformInfo = require('./platforms.json');
 
 var rootDirectories = {
     android: 'platforms/android',
-    blackberry: 'platforms/bb10',
     ios: 'platforms/ios',
     www: 'www'
 };
