@@ -39,14 +39,18 @@ var getPlatforms = function (projectName) {
         var iconPath   = processPath(platform.iconPath || '', projectName);
         var splashPath = processPath(platform.splashPath || '', projectName);
 
-        return Q.nfcall(fs.stat, platformPath).then(function(stat) {
+        return Q.nfcall(fs.stat, platformPath)
+            .then(extendPlatform.bind(null, null))
+            .catch(extendPlatform);
+
+        function extendPlatform(error, stat) {
             return _.extend(Object.create(platform), {
-                isAdded: stat.isDirectory(),
+                isAdded: error ? false : stat.isDirectory(),
 
                 iconPath: path.join(platformPath, iconPath),
                 splashPath: path.join(platformPath, splashPath)
             });
-        });
+        }
     });
 
     return Q.all(platforms);
@@ -73,7 +77,7 @@ program
     .option('-i, --icon [s]',   'Base icon used to generate others', resolveWithCWD, defaults.icon)
     .option('-s, --splash [s]', 'Base splash screen used to generate others', resolveWithCWD, defaults.splash)
     .option('-c, --config [s]', 'Cordova configuration file location, used as the root of your project', resolveWithCWD,  defaults.config)
-    .option('-b, --background [s]', 'Background to use for icon', resolveWithCWD, null)
+    .option('-b, --background [s]', 'Background to use for icon on platforms that typically have one. Note that this option only has an affect when using a raster graphic as a base.', resolveWithCWD, null)
     .parse(process.argv);
 
 /**
