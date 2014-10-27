@@ -113,8 +113,12 @@ var getProjectName = function () {
  */
 var generateIcon = function (platform, icon) {
     var deferred = Q.defer();
+    var srcPath = settings.ICON_FILE;
+    var platformPath = srcPath.replace(/\.png$/, '-' + platform.name + '.png')
+    if (fs.existsSync(platformPath))
+        srcPath = platformPath;
     ig.resize({
-        srcPath: settings.ICON_FILE,
+        srcPath: srcPath,
         dstPath: platform.iconsPath + icon.name,
         quality: 1,
         format: 'png',
