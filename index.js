@@ -6,57 +6,6 @@ var _      = require('underscore');
 var Q      = require('q');
 
 /**
- * Check which platforms are added to the project and return their icon names and sized
- *
- * @param  {String} projectName
- * @return {Promise} resolves with an array of platforms
- */
-var getPlatforms = function (projectName) {
-    var deferred = Q.defer();
-    var platforms = [];
-    platforms.push({
-        name : 'ios',
-        // TODO: use async fs.exists
-        isAdded : fs.existsSync('platforms/ios'),
-        iconsPath : 'platforms/ios/' + projectName + '/Resources/icons/',
-        icons : [
-            { name : 'icon-40.png',       size : 40  },
-            { name : 'icon-40@2x.png',    size : 80  },
-            { name : 'icon-50.png',       size : 50  },
-            { name : 'icon-50@2x.png',    size : 100 },
-            { name : 'icon-60.png',       size : 60  },
-            { name : 'icon-60@2x.png',    size : 120 },
-            { name : 'icon-60@3x.png',    size : 180 },
-            { name : 'icon-72.png',       size : 72  },
-            { name : 'icon-72@2x.png',    size : 144 },
-            { name : 'icon-76.png',       size : 76  },
-            { name : 'icon-76@2x.png',    size : 152 },
-            { name : 'icon-small.png',    size : 29  },
-            { name : 'icon-small@2x.png', size : 58  },
-            { name : 'icon.png',          size : 57  },
-            { name : 'icon@2x.png',       size : 114 },
-        ]
-    });
-    platforms.push({
-        name : 'android',
-        iconsPath : 'platforms/android/res/',
-        isAdded : fs.existsSync('platforms/android'),
-        icons : [
-            { name : 'drawable/icon.png',       size : 96 },
-            { name : 'drawable-hdpi/icon.png',  size : 72 },
-            { name : 'drawable-ldpi/icon.png',  size : 36 },
-            { name : 'drawable-mdpi/icon.png',  size : 48 },
-            { name : 'drawable-xhdpi/icon.png', size : 96 },
-            { name : 'drawable-xxhdpi/icon.png', size : 144 },
-        ]
-    });
-    // TODO: add all platforms
-    deferred.resolve(platforms);
-    return deferred.promise;
-};
-
-
-/**
  * @var {Object} settings - names of the confix file and of the icon image
  * TODO: add option to get these values as CLI params
  */
@@ -126,22 +75,39 @@ var generateIcon = function (platform, image) {
     
     if(platform.type == 'Icons'){
         imageProp.srcPath = settings.ICON_FILE;
+        resizeImage();
     } else {
         if(image.width > image.height){
             imageProp.srcPath = settings.SPLASH_FILE_LANDSCAPE;
+            cropImage();
         } else {
             imageProp.srcPath = settings.SPLASH_FILE_PORTRAIT;
+            cropImage();
         }
     }
 
-    ig.resize(imageProp, function(err, stdout, stderr){
-        if (err) {
-            deferred.reject(err);
-        } else {
-            deferred.resolve();
-            display.success(image.name + ' created');
-        }
-    });
+    function resizeImage(){
+        ig.resize(imageProp, function(err, stdout, stderr){
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve();
+                display.success(image.name + ' created');
+            }
+        });
+    }
+
+    function cropImage(){
+        ig.crop(imageProp, function(err, stdout, stderr){
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve();
+                display.success(image.name + ' created');
+            }
+        });
+    }
+
 
     return deferred.promise;
 };
@@ -377,7 +343,6 @@ atLeastOnePlatformFound()
     .then(validImagesExist)
     .then(configFileExists)
     .then(getProjectName)
-    // .then(getPlatforms)
     .then(getPlatformsFromConfig)
     .then(generateIcons)
     .catch(function (err) {
