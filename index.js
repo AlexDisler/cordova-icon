@@ -62,7 +62,9 @@ var getPlatforms = function (projectName) {
  */
 var settings = {};
 settings.CONFIG_FILE = 'config.xml';
-settings.ICON_FILE   = 'icon.png';
+settings.ICON_FILE   = 'res/icon.png';
+settings.SPLASH_FILE_PORTRAIT = 'res/splash_p.png';
+settings.SPLASH_FILE_LANDSCAPE = 'res/splash_l.png';
 
 /**
  * @var {Object} console utils
@@ -112,23 +114,35 @@ var getProjectName = function () {
  * @param  {Object} icon
  * @return {Promise}
  */
-var generateIcon = function (platform, icon) {
+var generateIcon = function (platform, image) {
     var deferred = Q.defer();
-    ig.resize({
-        srcPath: settings.ICON_FILE,
-        dstPath: platform.iconsPath + icon.name,
+    var imageProp = {
+        dstPath: platform.iconsPath + image.name,
         quality: 1,
         format: 'png',
-        width: icon.size,
-        height: icon.size,
-    } , function(err, stdout, stderr){
+        width: image.width,
+        height: image.height,
+    };
+    
+    if(platform.type == 'Icons'){
+        imageProp.srcPath = settings.ICON_FILE;
+    } else {
+        if(image.width > image.height){
+            imageProp.srcPath = settings.SPLASH_FILE_LANDSCAPE;
+        } else {
+            imageProp.srcPath = settings.SPLASH_FILE_PORTRAIT;
+        }
+    }
+
+    ig.resize(imageProp, function(err, stdout, stderr){
         if (err) {
             deferred.reject(err);
         } else {
             deferred.resolve();
-            display.success(icon.name + ' created');
+            display.success(image.name + ' created');
         }
     });
+
     return deferred.promise;
 };
 
@@ -140,12 +154,19 @@ var generateIcon = function (platform, icon) {
  */
 var generateIconsForPlatform = function (platform) {
     var deferred = Q.defer();
-    display.header('Generating Icons for ' + platform.name);
+    display.header('Generating ' + platform.type + ' for ' + platform.name);
     var all = [];
-    var icons = platform.icons;
-    icons.forEach(function (icon) {
-        all.push(generateIcon(platform, icon));
-    });
+    
+    if (platform.icons) {
+        platform.icons.forEach(function (icon) {
+            all.push(generateIcon(platform, icon));
+        });
+    } else {
+        platform.splashes.forEach(function (splash) {
+            all.push(generateIcon(platform, splash));
+        });
+    }
+
     Q.all(all).then(function () {
         deferred.resolve();
     }).catch(function (err) {
@@ -183,7 +204,7 @@ var generateIcons = function (platforms) {
  */
 var atLeastOnePlatformFound = function () {
     var deferred = Q.defer();
-    getPlatforms().then(function (platforms) {
+    getPlatformsFromConfig().then(function (platforms) {
         var activePlatforms = _(platforms).where({ isAdded : true });
         if (activePlatforms.length > 0) {
             display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
@@ -197,18 +218,38 @@ var atLeastOnePlatformFound = function () {
 };
 
 /**
- * Checks if a valid icon file exists
+ * Checks if a valid images files exist
  *
  * @return {Promise} resolves if exists, rejects otherwise
  */
-var validIconExists = function () {
+var validImagesExist = function () {
     var deferred = Q.defer();
-    fs.exists(settings.ICON_FILE, function (exists) {
+    var all = []
+    
+    all.push(checkImage(settings.ICON_FILE));
+    all.push(checkImage(settings.SPLASH_FILE_PORTRAIT));
+    all.push(checkImage(settings.SPLASH_FILE_LANDSCAPE));
+
+    Q.all(all).then(function () {
+        deferred.resolve();
+    });
+
+    return deferred.promise;
+};
+
+/**
+ * Checks if a valid image file exists
+ *
+ * @return {Promise} resolves if exists, rejects otherwise
+ */
+var checkImage = function (file) {
+    var deferred = Q.defer();
+    fs.exists(file, function (exists) {
         if (exists) {
-            display.success(settings.ICON_FILE + ' exists');
+            display.success(file + ' exists');
             deferred.resolve();
         } else {
-            display.error(settings.ICON_FILE + ' does not exist in the root folder');
+            display.error(file + ' does not exist in the root folder');
             deferred.reject();
         }
     });
@@ -234,13 +275,110 @@ var configFileExists = function () {
     return deferred.promise;
 };
 
+/**
+ * Check which platforms are added to the project (via confix.xml) and return their icon names and size
+ *
+ * @param  {String} projectName
+ * @return {Promise} resolves with an array of platforms
+ */
+var getPlatformsFromConfig = function (projectName) {
+    var deferred = Q.defer();
+    var parser = new xml2js.Parser();
+    var platforms = [];
+    var folderCount = 0;
+    var all = [];
+
+    fs.readFile(settings.CONFIG_FILE, 'utf8', function(err, data){
+        parser.parseString(data, function (err, result) {
+            result.widget.platform.forEach(function(node){
+                getIcons(node, platforms, function(platforms_result){
+                    getSplash(node, platforms, function(platforms_result){
+                        folderCount++;
+
+                        if(folderCount == result.widget.platform.length){
+                            deferred.resolve(platforms_result);
+                        }
+                    });
+                });
+            });            
+        });
+    });
+
+    return deferred.promise;
+};
+
+/**
+ * extract the icon information from the node structure
+ *
+ * @param  {Object} node
+ * @param  {Array} platforms
+ * @param  {String} cb
+ * @return {Function} function with platforms array
+ */
+var getIcons = function (node, platforms, cb) {
+    var platform = {};
+
+    fs.mkdir('res/' + node.$.name, function(err){
+
+        platform.name = node.$.name;
+        platform.iconsPath = '';
+        platform.isAdded = fs.existsSync('platforms/' + node.$.name),
+        platform.icons = [];
+        platform.type = 'Icons';
+
+        if(node.icon){
+            node.icon.forEach(function(icon){
+                platform.icons.push({ name: icon.$.src, width: icon.$.width, height: icon.$.height });
+            });
+        }
+
+        platforms.push(platform);
+
+        return cb(platforms);
+    });
+};
+
+/**
+ * extract the splash information from the node structure
+ *
+ * @param  {Object} node
+ * @param  {Array} platforms
+ * @param  {String} cb
+ * @return {Function} function with platforms array
+ */
+var getSplash = function (node, platforms, cb) {
+    var platform = {};
+
+    fs.mkdir('res/screen', function(err){
+        fs.mkdir('res/screen/' + node.$.name, function(err){
+
+            platform.name = node.$.name;
+            platform.iconsPath = '';
+            platform.isAdded = fs.existsSync('platforms/' + node.$.name),
+            platform.splashes = [];
+            platform.type = 'Splashes';
+
+            if(node.splash){
+                node.splash.forEach(function(splash){
+                    platform.splashes.push({ name: splash.$.src, width: splash.$.width, height: splash.$.height });
+                });
+            }
+
+            platforms.push(platform);
+
+            return cb(platforms);
+        });
+    });
+};
+
 display.header('Checking Project & Icon');
 
 atLeastOnePlatformFound()
-    .then(validIconExists)
+    .then(validImagesExist)
     .then(configFileExists)
     .then(getProjectName)
-    .then(getPlatforms)
+    // .then(getPlatforms)
+    .then(getPlatformsFromConfig)
     .then(generateIcons)
     .catch(function (err) {
         if (err) {
