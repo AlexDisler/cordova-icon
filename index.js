@@ -4,6 +4,7 @@ var ig     = require('imagemagick');
 var colors = require('colors');
 var _      = require('underscore');
 var Q      = require('q');
+var exec   = require('child_process').exec;
 
 /**
  * Check which platforms are added to the project and return their icon names and sized
@@ -156,7 +157,7 @@ var generateIconsForPlatform = function (platform) {
 
 /**
  * Goes over all the platforms and triggers icon generation
- * 
+ *
  * @param  {Array} platforms
  * @return {Promise}
  */
@@ -172,6 +173,25 @@ var generateIcons = function (platforms) {
     });
     Q.all(all).then(function () {
         deferred.resolve();
+    });
+    return deferred.promise;
+};
+
+/**
+ * Checks if ImageMagick is installed
+ *
+ * @return {Promise} resolves if ImageMagick is installed, rejects otherwise
+ */
+var imageMagickInstalled = function () {
+    var deferred = Q.defer();
+    exec('convert -version', function (error) {
+        if (!error) {
+            display.success('ImageMagick found');
+            deferred.resolve();
+        } else {
+            display.error('ImageMagick is not installed/available. Please see README.md for instructions.');
+            deferred.reject();
+        }
     });
     return deferred.promise;
 };
@@ -236,7 +256,8 @@ var configFileExists = function () {
 
 display.header('Checking Project & Icon');
 
-atLeastOnePlatformFound()
+imageMagickInstalled()
+    .then(atLeastOnePlatformFound)
     .then(validIconExists)
     .then(configFileExists)
     .then(getProjectName)
