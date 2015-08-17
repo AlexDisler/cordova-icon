@@ -41,14 +41,19 @@ var getPlatforms = function (projectName) {
         name : 'android',
         iconsPath : 'platforms/android/res/',
         isAdded : fs.existsSync('platforms/android'),
-        icons : [
-            { name : 'drawable/icon.png',       size : 96 },
-            { name : 'drawable-hdpi/icon.png',  size : 72 },
-            { name : 'drawable-ldpi/icon.png',  size : 36 },
-            { name : 'drawable-mdpi/icon.png',  size : 48 },
-            { name : 'drawable-xhdpi/icon.png', size : 96 },
-            { name : 'drawable-xxhdpi/icon.png', size : 144 },
-        ]
+        get icons () {
+            return (
+                fs.existsSync(this.iconsPath + 'drawable')
+                    ? [{ name : 'drawable/icon.png', size : 96 }]
+                    : []
+            ).concat(
+                { name : 'drawable-hdpi/icon.png',   size : 72  },
+                { name : 'drawable-ldpi/icon.png',   size : 36  },
+                { name : 'drawable-mdpi/icon.png',   size : 48  },
+                { name : 'drawable-xhdpi/icon.png',  size : 96  },
+                { name : 'drawable-xxhdpi/icon.png', size : 144 }
+            );
+        }
     });
     // TODO: add all platforms
     deferred.resolve(platforms);
