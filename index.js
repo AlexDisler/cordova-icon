@@ -120,7 +120,7 @@ var generateIcon = function (platform, icon) {
         quality: 1,
         format: 'png',
         width: icon.size,
-        height: icon.size,
+        height: icon.size+'!',
     } , function(err, stdout, stderr){
         if (err) {
             deferred.reject(err);
