@@ -63,7 +63,7 @@ var getPlatforms = function (projectName) {
  */
 var settings = {};
 settings.CONFIG_FILE = argv.config || 'config.xml';
-settings.ICON_FILE   = argv.config || 'icon.png';
+settings.ICON_FILE   = argv.icon || 'icon.png';
 
 /**
  * @var {Object} console utils
