@@ -4,6 +4,7 @@ var ig     = require('imagemagick');
 var colors = require('colors');
 var _      = require('underscore');
 var Q      = require('q');
+var argv   = require('yargs').argv;
 
 /**
  * Check which platforms are added to the project and return their icon names and sized
@@ -59,11 +60,10 @@ var getPlatforms = function (projectName) {
 
 /**
  * @var {Object} settings - names of the confix file and of the icon image
- * TODO: add option to get these values as CLI params
  */
 var settings = {};
-settings.CONFIG_FILE = 'config.xml';
-settings.ICON_FILE   = 'icon.png';
+settings.CONFIG_FILE = argv.config || 'config.xml';
+settings.ICON_FILE   = argv.icon || 'icon.png';
 
 /**
  * @var {Object} console utils
@@ -157,7 +157,7 @@ var generateIconsForPlatform = function (platform) {
 
 /**
  * Goes over all the platforms and triggers icon generation
- * 
+ *
  * @param  {Array} platforms
  * @return {Promise}
  */
