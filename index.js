@@ -26,8 +26,8 @@ if (!String.prototype.includes) {
 var settings = {};
 settings.CONFIG_FILE  = argv.config || 'config.xml';
 settings.ICON_FILE    = argv.icon || 'icon.png';
-settings.IOS_DEST     = argv['ios-dest'] ? argv['ios-dest'].stripTrailingSlash() : false;
-settings.ANDROID_DEST = argv['android-dest'] ? argv['android-dest'].stripTrailingSlash() : false;
+settings.IOS_DEST      = argv.iosDest ? argv.iosDest.stripTrailingSlash() : false;
+settings.ANDROID_DEST  = argv.androidDest ? argv.androidDest.stripTrailingSlash() : false;
 
 /**
  * Check which platforms are added to the project and return their icon names and sized
