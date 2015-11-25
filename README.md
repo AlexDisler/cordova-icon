@@ -6,13 +6,17 @@ Automatic icon resizing for Cordova. Create an icon in the root folder of your C
 
 ### Installation
 
-     $ sudo npm install cordova-icon -g
+     $ sudo npm install cordova-icon-cli -g
 
 ### Usage
 
 Create an ```icon.png``` file in the root folder of your cordova project and run:
 
      $ cordova-icon
+
+To specify a custom splash image or config file use it like this:
+
+    $ cordova-icon --icon path/to/icon --config /path/to/config     
 
 For optimal results, your file has to be square, and at least 180\*180px.
 To be future-proof, since the generated file dimensions are going to evolve, you should probably use 512\*512px or 1024\*1024px.

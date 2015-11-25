@@ -1,10 +1,33 @@
-var fs     = require('fs');
-var xml2js = require('xml2js');
-var ig     = require('imagemagick');
-var colors = require('colors');
-var _      = require('underscore');
-var Q      = require('q');
-var argv   = require('yargs').argv;
+var fs     = require('fs'),
+    xml2js = require('xml2js'),
+    ig     = require('imagemagick');
+    colors = require('colors'),
+    _      = require('underscore');
+    Q      = require('q'),
+    argv   = require('yargs').argv,
+    mkdir = require('mkdir-p');
+
+String.prototype.stripTrailingSlash = function(str) {
+    if(this.substr(-1) === '/') {
+        return this.substr(0, this.length - 1);
+    }
+    return this;
+}
+
+if (!String.prototype.includes) {
+    String.prototype.includes = function() {'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+/**
+ * @var {Object} settings - names of the confix file and of the icon image
+ */
+var settings = {};
+settings.CONFIG_FILE  = argv.config || 'config.xml';
+settings.ICON_FILE    = argv.icon || 'icon.png';
+settings.IOS_DEST     = argv['ios-dest'] ? argv['ios-dest'].stripTrailingSlash() : false;
+settings.ANDROID_DEST = argv['android-dest'] ? argv['android-dest'].stripTrailingSlash() : false;
 
 /**
  * Check which platforms are added to the project and return their icon names and sized
@@ -19,7 +42,7 @@ var getPlatforms = function (projectName) {
         name : 'ios',
         // TODO: use async fs.exists
         isAdded : fs.existsSync('platforms/ios'),
-        iconsPath : 'platforms/ios/' + projectName + '/Resources/icons/',
+        iconsPath : settings.IOS_DEST ? settings.IOS_DEST + '/ios/' : 'platforms/ios/' + projectName + '/Resources/icons/',
         icons : [
             { name : 'icon-40.png',       size : 40  },
             { name : 'icon-40@2x.png',    size : 80  },
@@ -40,7 +63,7 @@ var getPlatforms = function (projectName) {
     });
     platforms.push({
         name : 'android',
-        iconsPath : 'platforms/android/res/',
+        iconsPath :settings.ANDROID_DEST ? settings.ANDROID_DEST + '/android/' : 'platforms/android/res/',
         isAdded : fs.existsSync('platforms/android'),
         icons : [
             { name : 'drawable/icon.png',       size : 96 },
@@ -56,14 +79,6 @@ var getPlatforms = function (projectName) {
     deferred.resolve(platforms);
     return deferred.promise;
 };
-
-
-/**
- * @var {Object} settings - names of the confix file and of the icon image
- */
-var settings = {};
-settings.CONFIG_FILE = argv.config || 'config.xml';
-settings.ICON_FILE   = argv.icon || 'icon.png';
 
 /**
  * @var {Object} console utils
@@ -115,6 +130,11 @@ var getProjectName = function () {
  */
 var generateIcon = function (platform, icon) {
     var deferred = Q.defer();
+    if( !platform.iconsPath.includes('ios') ){
+        mkdir.sync(platform.iconsPath + icon.name.split('/icon.png')[0]);
+    }else {
+        mkdir.sync(platform.iconsPath);
+    }
     ig.resize({
         srcPath: settings.ICON_FILE,
         dstPath: platform.iconsPath + icon.name,
