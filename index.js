@@ -59,6 +59,7 @@ var getPlatforms = function (projectName) {
             { name: 'ApplicationIcon.png', size: 62 }
         ]
     });
+
     // TODO: add all platforms
     deferred.resolve(platforms);
     return deferred.promise;
