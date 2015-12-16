@@ -51,6 +51,14 @@ var getPlatforms = function (projectName) {
             { name : 'drawable-xxxhdpi/icon.png', size : 192 },
         ]
     });
+    platforms.push({
+        name: 'wp8',
+        isAdded: fs.existsSync('platforms/wp8'),
+        iconsPath: 'platforms/wp8/',
+        icons: [
+            { name: 'ApplicationIcon.png', size: 62 }
+        ]
+    });
     // TODO: add all platforms
     deferred.resolve(platforms);
     return deferred.promise;
