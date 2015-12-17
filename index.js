@@ -57,6 +57,7 @@ var getPlatforms = function (projectName) {
         iconsPath: 'platforms/wp8/',
         icons: [
             { name: 'ApplicationIcon.png', size: 62 }
+	    { name: 'Background.png', size: 173 }
         ]
     });
 
