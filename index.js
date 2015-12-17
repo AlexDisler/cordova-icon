@@ -56,7 +56,7 @@ var getPlatforms = function (projectName) {
         isAdded: fs.existsSync('platforms/wp8'),
         iconsPath: 'platforms/wp8/',
         icons: [
-            { name: 'ApplicationIcon.png', size: 62 }
+            { name: 'ApplicationIcon.png', size: 62 },
 	    { name: 'Background.png', size: 173 }
         ]
     });
