@@ -18,7 +18,7 @@ var getPlatforms = function (projectName) {
         name : 'ios',
         // TODO: use async fs.exists
         isAdded : fs.existsSync('platforms/ios'),
-        iconsPath : 'platforms/ios/' + projectName + '/Resources/icons/',
+        iconsPath : 'resources/ios/icon/',
         icons : [
             { name : 'icon-40.png',       size : 40  },
             { name : 'icon-40@2x.png',    size : 80  },
@@ -39,7 +39,7 @@ var getPlatforms = function (projectName) {
     });
     platforms.push({
         name : 'android',
-        iconsPath : 'platforms/android/res/',
+        iconsPath : 'resources/android/icon/',
         isAdded : fs.existsSync('platforms/android'),
         icons : [
             { name : 'drawable/icon.png',       size : 96 },
