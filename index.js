@@ -6,7 +6,7 @@ var _      = require('underscore');
 var Q      = require('q');
 
 /**
- * Check which platforms are added to the project and return their icon names and sized
+ * Check which platforms are added to the project and return their icon names and sizes
  *
  * @param  {String} projectName
  * @return {Promise} resolves with an array of platforms
@@ -78,7 +78,7 @@ var getPlatforms = function (projectName) {
 
 
 /**
- * @var {Object} settings - names of the confix file and of the icon image
+ * @var {Object} settings - names of the config file and of the icon image
  * TODO: add option to get these values as CLI params
  */
 var settings = {};
@@ -127,7 +127,7 @@ var getProjectName = function () {
 };
 
 /**
- * Resizes and creates a new icon in the platform's folder.
+ * Resizes, crops and creates a new icon in the platform's folder.
  *
  * @param  {Object} platform
  * @param  {Object} icon
@@ -141,7 +141,7 @@ var generateIcon = function (platform, icon) {
         quality: 1,
         format: 'png',
         width: icon.size,
-        height: icon.height || icon.size,
+        height: icon.size,
     } , function(err, stdout, stderr){
         if (err) {
             deferred.reject(err);
@@ -150,6 +150,23 @@ var generateIcon = function (platform, icon) {
             display.success(icon.name + ' created');
         }
     });
+    if (icon.height) {
+      ig.crop({
+          srcPath: settings.ICON_FILE,
+          dstPath: platform.iconsPath + icon.name,
+          quality: 1,
+          format: 'png',
+          width: icon.size,
+          height: icon.height,
+      } , function(err, stdout, stderr){
+          if (err) {
+              deferred.reject(err);
+          } else {
+              deferred.resolve();
+              display.success(icon.name + ' cropped');
+          }
+      });
+    }
     return deferred.promise;
 };
 
