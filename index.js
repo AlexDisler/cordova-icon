@@ -34,24 +34,44 @@ var getPlatforms = function (projectName) {
             { name : 'icon-small.png',    size : 29  },
             { name : 'icon-small@2x.png', size : 58  },
             { name : 'icon.png',          size : 57  },
-            { name : 'icon@2x.png',       size : 114 },
+            { name : 'icon@2x.png',       size : 114 }
         ]
     });
     platforms.push({
         name : 'android',
-        iconsPath : 'platforms/android/res/',
         isAdded : fs.existsSync('platforms/android'),
+        iconsPath : 'platforms/android/res/',
         icons : [
-            { name : 'drawable/icon.png',       size : 96 },
-            { name : 'drawable-hdpi/icon.png',  size : 72 },
-            { name : 'drawable-ldpi/icon.png',  size : 36 },
-            { name : 'drawable-mdpi/icon.png',  size : 48 },
-            { name : 'drawable-xhdpi/icon.png', size : 96 },
-            { name : 'drawable-xxhdpi/icon.png', size : 144 },
-            { name : 'drawable-xxxhdpi/icon.png', size : 192 },
+            { name : 'drawable/icon.png',         size : 96  },
+            { name : 'drawable-hdpi/icon.png',    size : 72  },
+            { name : 'drawable-ldpi/icon.png',    size : 36  },
+            { name : 'drawable-mdpi/icon.png',    size : 48  },
+            { name : 'drawable-xhdpi/icon.png',   size : 96  },
+            { name : 'drawable-xxhdpi/icon.png',  size : 144 },
+            { name : 'drawable-xxxhdpi/icon.png', size : 192 }
         ]
     });
-    // TODO: add all platforms
+    platforms.push({
+        name : 'windows',
+        isAdded : fs.existsSync('platforms/windows'),
+        iconsPath : 'platforms/windows/images/',
+        icons : [
+            { name : 'Square30x30Logo.scale-100.png',   size : 30  },
+            { name : 'Square44x44Logo.scale-100.png',   size : 44  },
+            { name : 'Square44x44Logo.scale-240.png',   size : 106 },
+            { name : 'Square70x70Logo.scale-100.png',   size : 70  },
+            { name : 'Square71x71Logo.scale-100.png',   size : 71  },
+            { name : 'Square71x71Logo.scale-240.png',   size : 170 },
+            { name : 'Square150x150Logo.scale-100.png', size : 150 },
+            { name : 'Square150x150Logo.scale-240.png', size : 360 },
+            { name : 'Square310x310Logo.scale-100.png', size : 310 },
+            { name : 'StoreLogo.scale-100.png',         size : 50  },
+            { name : 'StoreLogo.scale-240.png',         size : 120 },
+            { name : 'Wide310x150Logo.scale-100.png',   size : 310, height: 150 },
+            { name : 'Wide310x150Logo.scale-240.png',   size : 744, height: 360 }
+        ]
+    });
+    // TODO: add missing platforms
     deferred.resolve(platforms);
     return deferred.promise;
 };
@@ -121,7 +141,7 @@ var generateIcon = function (platform, icon) {
         quality: 1,
         format: 'png',
         width: icon.size,
-        height: icon.size,
+        height: icon.height || icon.size,
     } , function(err, stdout, stderr){
         if (err) {
             deferred.reject(err);
@@ -157,7 +177,7 @@ var generateIconsForPlatform = function (platform) {
 
 /**
  * Goes over all the platforms and triggers icon generation
- * 
+ *
  * @param  {Array} platforms
  * @return {Promise}
  */
