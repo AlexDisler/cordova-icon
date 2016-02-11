@@ -24,7 +24,6 @@ var getPlatforms = function (projectName) {
             { name : 'icon-40@2x.png',    size : 80  },
             { name : 'icon-50.png',       size : 50  },
             { name : 'icon-50@2x.png',    size : 100 },
-            { name : 'icon-60.png',       size : 60  },
             { name : 'icon-60@2x.png',    size : 120 },
             { name : 'icon-60@3x.png',    size : 180 },
             { name : 'icon-72.png',       size : 72  },
@@ -33,6 +32,7 @@ var getPlatforms = function (projectName) {
             { name : 'icon-76@2x.png',    size : 152 },
             { name : 'icon-small.png',    size : 29  },
             { name : 'icon-small@2x.png', size : 58  },
+            { name : 'icon-small@3x.png', size : 87  },
             { name : 'icon.png',          size : 57  },
             { name : 'icon@2x.png',       size : 114 }
         ]
