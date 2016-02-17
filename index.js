@@ -42,13 +42,13 @@ var getPlatforms = function (projectName) {
         iconsPath : 'resources/android/icon/',
         isAdded : fs.existsSync('platforms/android'),
         icons : [
-            { name : 'drawable/icon.png',       size : 96 },
-            { name : 'drawable-hdpi/icon.png',  size : 72 },
-            { name : 'drawable-ldpi/icon.png',  size : 36 },
-            { name : 'drawable-mdpi/icon.png',  size : 48 },
-            { name : 'drawable-xhdpi/icon.png', size : 96 },
-            { name : 'drawable-xxhdpi/icon.png', size : 144 },
-            { name : 'drawable-xxxhdpi/icon.png', size : 192 },
+            { name : 'drawable-icon.png',       size : 96 },
+            { name : 'drawable-hdpi-icon.png',  size : 72 },
+            { name : 'drawable-ldpi-icon.png',  size : 36 },
+            { name : 'drawable-mdpi-icon.png',  size : 48 },
+            { name : 'drawable-xhdpi-icon.png', size : 96 },
+            { name : 'drawable-xxhdpi-icon.png', size : 144 },
+            { name : 'drawable-xxxhdpi-icon.png', size : 192 },
         ]
     });
     // TODO: add all platforms
@@ -157,7 +157,7 @@ var generateIconsForPlatform = function (platform) {
 
 /**
  * Goes over all the platforms and triggers icon generation
- * 
+ *
  * @param  {Array} platforms
  * @return {Promise}
  */
