@@ -157,7 +157,7 @@ var generateIconsForPlatform = function (platform) {
 
 /**
  * Goes over all the platforms and triggers icon generation
- * 
+ *
  * @param  {Array} platforms
  * @return {Promise}
  */
