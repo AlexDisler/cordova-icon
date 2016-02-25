@@ -125,6 +125,7 @@ var generateIcon = function (platform, icon) {
         format: 'png',
         width: icon.size,
         height: icon.size,
+        customArgs: ['-define', 'png:preserve-colormap']
     } , function(err, stdout, stderr){
         if (err) {
             deferred.reject(err);
