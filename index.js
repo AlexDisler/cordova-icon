@@ -6,7 +6,7 @@ var _      = require('underscore');
 var Q      = require('q');
 
 /**
- * Check which platforms are added to the project and return their icon names and sized
+ * Check which platforms are added to the project and return their icon names and sizes
  *
  * @param  {String} projectName
  * @return {Promise} resolves with an array of platforms
@@ -25,7 +25,6 @@ var getPlatforms = function (projectName) {
             { name : 'icon-50.png',       size : 50  },
             { name : 'icon-57.png',       size : 57  },
             { name : 'icon-50@2x.png',    size : 100 },
-            { name : 'icon-60.png',       size : 60  },
             { name : 'icon-60@2x.png',    size : 120 },
             { name : 'icon-60@3x.png',    size : 180 },
             { name : 'icon-72.png',       size : 72  },
@@ -36,32 +35,53 @@ var getPlatforms = function (projectName) {
             { name : 'icon-152.png',      size : 152 },
             { name : 'icon-small.png',    size : 29  },
             { name : 'icon-small@2x.png', size : 58  },
+            { name : 'icon-small@3x.png', size : 87  },
             { name : 'icon.png',          size : 57  },
-            { name : 'icon@2x.png',       size : 114 },
+            { name : 'icon@2x.png',       size : 114 }
         ]
     });
     platforms.push({
         name : 'android',
-        iconsPath : 'platforms/android/res/',
         isAdded : fs.existsSync('platforms/android'),
+        iconsPath : 'platforms/android/res/',
         icons : [
-            { name : 'drawable/icon.png',       size : 96 },
-            { name : 'drawable-hdpi/icon.png',  size : 72 },
-            { name : 'drawable-ldpi/icon.png',  size : 36 },
-            { name : 'drawable-mdpi/icon.png',  size : 48 },
-            { name : 'drawable-xhdpi/icon.png', size : 96 },
-            { name : 'drawable-xxhdpi/icon.png', size : 144 },
-            { name : 'drawable-xxxhdpi/icon.png', size : 192 },
+            { name : 'drawable/icon.png',         size : 96  },
+            { name : 'drawable-hdpi/icon.png',    size : 72  },
+            { name : 'drawable-ldpi/icon.png',    size : 36  },
+            { name : 'drawable-mdpi/icon.png',    size : 48  },
+            { name : 'drawable-xhdpi/icon.png',   size : 96  },
+            { name : 'drawable-xxhdpi/icon.png',  size : 144 },
+            { name : 'drawable-xxxhdpi/icon.png', size : 192 }
         ]
     });
-    // TODO: add all platforms
+    platforms.push({
+        name : 'windows',
+        isAdded : fs.existsSync('platforms/windows'),
+        iconsPath : 'platforms/windows/images/',
+        icons : [
+            { name : 'Square30x30Logo.scale-100.png',   size : 30  },
+            { name : 'Square44x44Logo.scale-100.png',   size : 44  },
+            { name : 'Square44x44Logo.scale-240.png',   size : 106 },
+            { name : 'Square70x70Logo.scale-100.png',   size : 70  },
+            { name : 'Square71x71Logo.scale-100.png',   size : 71  },
+            { name : 'Square71x71Logo.scale-240.png',   size : 170 },
+            { name : 'Square150x150Logo.scale-100.png', size : 150 },
+            { name : 'Square150x150Logo.scale-240.png', size : 360 },
+            { name : 'Square310x310Logo.scale-100.png', size : 310 },
+            { name : 'StoreLogo.scale-100.png',         size : 50  },
+            { name : 'StoreLogo.scale-240.png',         size : 120 },
+            { name : 'Wide310x150Logo.scale-100.png',   size : 310, height: 150 },
+            { name : 'Wide310x150Logo.scale-240.png',   size : 744, height: 360 }
+        ]
+    });
+    // TODO: add missing platforms
     deferred.resolve(platforms);
     return deferred.promise;
 };
 
 
 /**
- * @var {Object} settings - names of the confix file and of the icon image
+ * @var {Object} settings - names of the config file and of the icon image
  * TODO: add option to get these values as CLI params
  */
 var settings = {};
@@ -110,7 +130,7 @@ var getProjectName = function () {
 };
 
 /**
- * Resizes and creates a new icon in the platform's folder.
+ * Resizes, crops and creates a new icon in the platform's folder.
  *
  * @param  {Object} platform
  * @param  {Object} icon
@@ -133,6 +153,23 @@ var generateIcon = function (platform, icon) {
             display.success(icon.name + ' created');
         }
     });
+    if (icon.height) {
+      ig.crop({
+          srcPath: settings.ICON_FILE,
+          dstPath: platform.iconsPath + icon.name,
+          quality: 1,
+          format: 'png',
+          width: icon.size,
+          height: icon.height,
+      } , function(err, stdout, stderr){
+          if (err) {
+              deferred.reject(err);
+          } else {
+              deferred.resolve();
+              display.success(icon.name + ' cropped');
+          }
+      });
+    }
     return deferred.promise;
 };
 
