@@ -23,7 +23,6 @@ var getPlatforms = function (projectName) {
             { name : 'icon-40.png',       size : 40  },
             { name : 'icon-40@2x.png',    size : 80  },
             { name : 'icon-50.png',       size : 50  },
-            { name : 'icon-57.png',       size : 57  },
             { name : 'icon-50@2x.png',    size : 100 },
             { name : 'icon-60.png',       size : 60  },
             { name : 'icon-60@2x.png',    size : 120 },
@@ -32,8 +31,6 @@ var getPlatforms = function (projectName) {
             { name : 'icon-72@2x.png',    size : 144 },
             { name : 'icon-76.png',       size : 76  },
             { name : 'icon-76@2x.png',    size : 152 },
-            { name : 'icon-120.png',      size : 120 },
-            { name : 'icon-152.png',      size : 152 },
             { name : 'icon-small.png',    size : 29  },
             { name : 'icon-small@2x.png', size : 58  },
             { name : 'icon.png',          size : 57  },
@@ -42,8 +39,8 @@ var getPlatforms = function (projectName) {
     });
     platforms.push({
         name : 'android',
-        iconsPath : 'platforms/android/res/',
         isAdded : fs.existsSync('platforms/android'),
+        iconsPath : 'platforms/android/res/',
         icons : [
             { name : 'drawable/icon.png',       size : 96 },
             { name : 'drawable-hdpi/icon.png',  size : 72 },
