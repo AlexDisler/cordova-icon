@@ -35,6 +35,7 @@ var getPlatforms = function (projectName) {
             { name : 'icon-small@2x.png', size : 58  },
             { name : 'icon.png',          size : 57  },
             { name : 'icon@2x.png',       size : 114 },
+            { name : 'icon-83.5@2x.png',  size : 167 }
         ]
     });
     platforms.push({
