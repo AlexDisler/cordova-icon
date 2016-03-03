@@ -51,7 +51,7 @@ var getPlatforms = function (projectName) {
             { name : 'drawable-mdpi/icon.png',  size : 48 },
             { name : 'drawable-xhdpi/icon.png', size : 96 },
             { name : 'drawable-xxhdpi/icon.png', size : 144 },
-            { name : 'drawable-xxxhdpi/icon.png', size : 192 },
+            { name : 'drawable-xxxhdpi/icon.png', size : 192 }
         ]
     });
     platforms.push({
@@ -152,7 +152,7 @@ var getProjectName = function () {
 };
 
 /**
- * Resizes, crops and creates a new icon in the platform's folder.
+ * Resizes, crops (if needed) and creates a new icon in the platform's folder.
  *
  * @param  {Object} platform
  * @param  {Object} icon
@@ -171,7 +171,7 @@ var generateIcon = function (platform, icon) {
         quality: 1,
         format: 'png',
         width: icon.size,
-        height: icon.size,
+        height: icon.size
     } , function(err, stdout, stderr){
         if (err) {
             deferred.reject(err);
@@ -183,11 +183,11 @@ var generateIcon = function (platform, icon) {
     if (icon.height) {
       ig.crop({
           srcPath: settings.ICON_FILE,
-          dstPath: platform.iconsPath + icon.name,
+          dstPath: dstPath,
           quality: 1,
           format: 'png',
           width: icon.size,
-          height: icon.height,
+          height: icon.height
       } , function(err, stdout, stderr){
           if (err) {
               deferred.reject(err);
@@ -257,7 +257,9 @@ var atLeastOnePlatformFound = function () {
             display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
             deferred.resolve();
         } else {
-            display.error('No cordova platforms found. Make sure you are in the root folder of your Cordova project and add platforms with \'cordova platform add\'');
+            display.error('No cordova platforms found.' +
+                'Make sure you are in the root folder of your Cordova project' +
+                'and add platforms with \'cordova platform add\'');
             deferred.reject();
         }
     });
