@@ -20,7 +20,11 @@ Create an `icon.png` file in the root folder of your cordova project and run:
 
      $ cordova-icon
 
-For optimal results, your file has to be at least 1240\*1240px.
+For good results, your file shoud be:
+
+- square
+- for Android and iOS, at least 192\*192px (512\*512px recommended to be future-proof)
+- for Windows, at least 1240\*1240px
 
 ### Creating a cordova-cli hook
 
