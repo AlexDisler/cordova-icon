@@ -1,4 +1,5 @@
 var fs     = require('fs');
+var path   = require('path');
 var xml2js = require('xml2js');
 var ig     = require('imagemagick');
 var colors = require('colors');
@@ -161,11 +162,17 @@ var generateIcon = function (platform, icon) {
     var deferred = Q.defer();
     var srcPath = settings.ICON_FILE;
     var platformPath = srcPath.replace(/\.png$/, '-' + platform.name + '.png')
-    if (fs.existsSync(platformPath))
+    if (fs.existsSync(platformPath)) {
         srcPath = platformPath;
+    }
+    var dstPath = platform.iconsPath + icon.name;
+    var dst = path.dirname(dstPath);
+    if (!fs.existsSync(dst)) {
+        fs.mkdirSync(dst);
+    }
     ig.resize({
         srcPath: srcPath,
-        dstPath: platform.iconsPath + icon.name,
+        dstPath: dstPath,
         quality: 1,
         format: 'png',
         width: icon.size,
