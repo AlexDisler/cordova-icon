@@ -7,7 +7,7 @@ var _      = require('underscore');
 var Q      = require('q');
 
 /**
- * Check which platforms are added to the project and return their icon names and sized
+ * Check which platforms are added to the project and return their icon names and sizes
  *
  * @param  {String} projectName
  * @return {Promise} resolves with an array of platforms
@@ -45,8 +45,8 @@ var getPlatforms = function (projectName) {
     });
     platforms.push({
         name : 'android',
-        iconsPath : 'platforms/android/res/',
         isAdded : fs.existsSync('platforms/android'),
+        iconsPath : 'platforms/android/res/',
         icons : [
             { name : 'drawable/icon.png',       size : 96 },
             { name : 'drawable-hdpi/icon.png',  size : 72 },
@@ -57,14 +57,56 @@ var getPlatforms = function (projectName) {
             { name : 'drawable-xxxhdpi/icon.png', size : 192 },
         ]
     });
-    // TODO: add all platforms
+    platforms.push({
+        name : 'windows',
+        isAdded : fs.existsSync('platforms/windows'),
+        iconsPath : 'platforms/windows/images/',
+        icons : [
+            { name : 'StoreLogo.scale-100.png', size : 50  },
+            { name : 'StoreLogo.scale-125.png', size : 63  },
+            { name : 'StoreLogo.scale-150.png', size : 75  },
+            { name : 'StoreLogo.scale-200.png', size : 100 },
+            { name : 'StoreLogo.scale-400.png', size : 200 },
+
+            { name : 'Square44x44Logo.scale-100.png', size : 44  },
+            { name : 'Square44x44Logo.scale-125.png', size : 55  },
+            { name : 'Square44x44Logo.scale-150.png', size : 66  },
+            { name : 'Square44x44Logo.scale-200.png', size : 88  },
+            { name : 'Square44x44Logo.scale-400.png', size : 176 },
+
+            { name : 'Square71x71Logo.scale-100.png', size : 71  },
+            { name : 'Square71x71Logo.scale-125.png', size : 89  },
+            { name : 'Square71x71Logo.scale-150.png', size : 107 },
+            { name : 'Square71x71Logo.scale-200.png', size : 142 },
+            { name : 'Square71x71Logo.scale-400.png', size : 284 },
+
+            { name : 'Square150x150Logo.scale-100.png', size : 150 },
+            { name : 'Square150x150Logo.scale-125.png', size : 188 },
+            { name : 'Square150x150Logo.scale-150.png', size : 225 },
+            { name : 'Square150x150Logo.scale-200.png', size : 300 },
+            { name : 'Square150x150Logo.scale-400.png', size : 600 },
+
+            { name : 'Square310x310Logo.scale-100.png', size : 310  },
+            { name : 'Square310x310Logo.scale-125.png', size : 388  },
+            { name : 'Square310x310Logo.scale-150.png', size : 465  },
+            { name : 'Square310x310Logo.scale-200.png', size : 620  },
+            { name : 'Square310x310Logo.scale-400.png', size : 1240 },
+
+            { name : 'Wide310x150Logo.scale-100.png', size : 310, height : 150  },
+            { name : 'Wide310x150Logo.scale-125.png', size : 388, height : 188  },
+            { name : 'Wide310x150Logo.scale-150.png', size : 465, height : 225  },
+            { name : 'Wide310x150Logo.scale-200.png', size : 620, height : 300  },
+            { name : 'Wide310x150Logo.scale-400.png', size : 1240, height : 600 }
+        ]
+    });
+    // TODO: add missing platforms
     deferred.resolve(platforms);
     return deferred.promise;
 };
 
 
 /**
- * @var {Object} settings - names of the confix file and of the icon image
+ * @var {Object} settings - names of the config file and of the icon image
  * TODO: add option to get these values as CLI params
  */
 var settings = {};
@@ -113,7 +155,7 @@ var getProjectName = function () {
 };
 
 /**
- * Resizes and creates a new icon in the platform's folder.
+ * Resizes, crops and creates a new icon in the platform's folder.
  *
  * @param  {Object} platform
  * @param  {Object} icon
@@ -141,6 +183,23 @@ var generateIcon = function (platform, icon) {
             display.success(icon.name + ' created');
         }
     });
+    if (icon.height) {
+      ig.crop({
+          srcPath: settings.ICON_FILE,
+          dstPath: platform.iconsPath + icon.name,
+          quality: 1,
+          format: 'png',
+          width: icon.size,
+          height: icon.height,
+      } , function(err, stdout, stderr){
+          if (err) {
+              deferred.reject(err);
+          } else {
+              deferred.resolve();
+              display.success(icon.name + ' cropped');
+          }
+      });
+    }
     return deferred.promise;
 };
 
