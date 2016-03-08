@@ -2,6 +2,9 @@
 All notable changes to this project [will be documented](http://keepachangelog.com/) in this file.
 This project *tries to* adhere to [Semantic Versioning](http://semver.org/).
 
+## [0.6.0] - 2016-03-08
+- Allow platform-specific icons (0c26dfe)
+
 ## [0.5.0] - 2016-03-03
 - For iOS, add `icon-small@3x.png` & `icon-83.5@2x.png` (3e42077 - 5ba1e4e)
 - For iOS, remove icons considered as "Unassigned" in Xcode (32eebea)
