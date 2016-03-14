@@ -25,7 +25,6 @@ var getPlatforms = function (projectName) {
             { name : 'icon-40@2x.png',    size : 80  },
             { name : 'icon-50.png',       size : 50  },
             { name : 'icon-50@2x.png',    size : 100 },
-            { name : 'icon-60.png',       size : 60  },
             { name : 'icon-60@2x.png',    size : 120 },
             { name : 'icon-60@3x.png',    size : 180 },
             { name : 'icon-72.png',       size : 72  },
