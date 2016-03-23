@@ -5,6 +5,7 @@ var ig     = require('imagemagick');
 var colors = require('colors');
 var _      = require('underscore');
 var Q      = require('q');
+var wrench = require('wrench');
 
 /**
  * Check which platforms are added to the project and return their icon names and sizes
@@ -168,7 +169,7 @@ var generateIcon = function (platform, icon) {
     var dstPath = platform.iconsPath + icon.name;
     var dst = path.dirname(dstPath);
     if (!fs.existsSync(dst)) {
-        fs.mkdirSync(dst);
+        wrench.mkdirSyncRecursive(dst);
     }
     ig.resize({
         srcPath: srcPath,
