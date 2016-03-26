@@ -213,19 +213,13 @@ var generateIcon = function (platform, icon) {
  * @return {Promise}
  */
 var generateIconsForPlatform = function (platform) {
-  var deferred = Q.defer();
   display.header('Generating Icons for ' + platform.name);
   var all = [];
   var icons = platform.icons;
   icons.forEach(function (icon) {
     all.push(generateIcon(platform, icon));
   });
-  Q.all(all).then(function () {
-    deferred.resolve();
-  }).catch(function (err) {
-    console.log(err);
-  });
-  return deferred.promise;
+  return Promise.all(all);
 };
 
 /**
