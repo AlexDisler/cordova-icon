@@ -32,6 +32,6 @@
     "underscore": "^1.6.0",
     "wrench": "^1.5.8",
     "xml2js": "^0.4.3",
-    "optparse": "latest"
+    "optparse": "^1.0.5"
   }
 }
