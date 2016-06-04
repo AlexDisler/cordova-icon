@@ -278,8 +278,39 @@ var validIconExists = function () {
       display.success(settings.ICON_FILE + ' exists');
       deferred.resolve();
     } else {
-      display.error(settings.ICON_FILE + ' does not exist in the root folder');
-      deferred.reject();
+      getPlatforms()
+        .then(function(platforms) {
+          var all = [],
+            errors = [],
+            addedPlatforms = _(platforms).where({ isAdded: true });
+          addedPlatforms.forEach(function(platform) {
+            var sequence = Q.defer(),
+              srcPath = settings.ICON_FILE,
+              platformPath = srcPath.replace(/\.png$/, '-' + platform.name + '.png');
+            fs.exists(platformPath, function(exists) {
+              if (exists) {
+                display.success(platformPath + ' exists');
+              } else {
+                errors.push(platformPath + ' does not exist in the root folder');
+              }
+              sequence.resolve();
+            });
+            all.push(sequence.promise);
+          });
+          Q.all(all).then(function() {
+            if (errors.length && errors.length === addedPlatforms.length) {
+              display.error(settings.ICON_FILE + ' does not exist in the root folder');
+              deferred.reject();
+            } else if (errors.length) {
+              errors.forEach(function(err) {
+                display.error(err);
+              });
+              deferred.reject();
+            } else {
+              deferred.resolve();
+            }
+          })
+        });
     }
   });
   return deferred.promise;
