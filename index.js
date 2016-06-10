@@ -56,6 +56,20 @@ var getPlatforms = function (projectName) {
     ]
   });
   platforms.push({
+    name : 'osx',
+    // TODO: use async fs.exists
+    isAdded : fs.existsSync('platforms/osx'),
+    iconsPath : 'platforms/osx/' + projectName + '/Images.xcassets/AppIcon.appiconset/',
+    icons : [
+      { name : 'icon-16x16.png',    size : 16  },
+      { name : 'icon-32x32.png',    size : 32  },
+      { name : 'icon-64x64.png',    size : 64  },
+      { name : 'icon-128x128.png',  size : 128 },
+      { name : 'icon-256x256.png',  size : 256 },
+      { name : 'icon-512x512.png',  size : 512 }
+    ]
+  });
+  platforms.push({
     name : 'windows',
     isAdded : fs.existsSync('platforms/windows'),
     iconsPath : 'platforms/windows/images/',
