@@ -6,6 +6,7 @@ var colors = require('colors');
 var _      = require('underscore');
 var Q      = require('q');
 var wrench = require('wrench');
+var argv   = require('minimist')(process.argv.slice(2));
 
 /**
  * Check which platforms are added to the project and return their icon names and sizes
@@ -105,11 +106,10 @@ var getPlatforms = function (projectName) {
 
 /**
  * @var {Object} settings - names of the config file and of the icon image
- * TODO: add option to get these values as CLI params
  */
 var settings = {};
-settings.CONFIG_FILE = 'config.xml';
-settings.ICON_FILE   = 'icon.png';
+settings.CONFIG_FILE = argv.config || 'config.xml';
+settings.ICON_FILE   = argv.icon || 'icon.png';
 
 /**
  * @var {Object} console utils
@@ -278,7 +278,7 @@ var validIconExists = function () {
       display.success(settings.ICON_FILE + ' exists');
       deferred.resolve();
     } else {
-      display.error(settings.ICON_FILE + ' does not exist in the root folder');
+      display.error(settings.ICON_FILE + ' does not exist');
       deferred.reject();
     }
   });
@@ -297,7 +297,7 @@ var configFileExists = function () {
       display.success(settings.CONFIG_FILE + ' exists');
       deferred.resolve();
     } else {
-      display.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist in the root folder');
+      display.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist');
       deferred.reject();
     }
   });
