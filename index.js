@@ -6,11 +6,13 @@ var colors = require('colors');
 var _      = require('underscore');
 var Q      = require('q');
 var wrench = require('wrench');
+var optparse = require('optparse');
 
 /**
- * Check which platforms are added to the project and return their icon names and sizes
+ * Check which platforms are added to the project and return their icon names
+ * and sizes
  *
- * @param  {String} projectName
+ * @param {String} projectName
  * @return {Promise} resolves with an array of platforms
  */
 var getPlatforms = function (projectName) {
@@ -20,7 +22,9 @@ var getPlatforms = function (projectName) {
     name : 'ios',
     // TODO: use async fs.exists
     isAdded : fs.existsSync('platforms/ios'),
-    iconsPath : 'platforms/ios/' + projectName + '/Resources/icons/',
+    // The xcode dir: 'platforms/ios/' + projectName + '/Resources/icons/'
+    iconsPath : (settings.RESOURCE_PATH + '/' + settings.ICON_DIR + '/ios/').replace('//', '/'),
+    platformIconsPath: 'platforms/ios/' + projectName + '/Resources/icons/',
     icons : [
       { name : 'icon-40.png',       size : 40  },
       { name : 'icon-40@2x.png',    size : 80  },
@@ -44,7 +48,8 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'android',
     isAdded : fs.existsSync('platforms/android'),
-    iconsPath : 'platforms/android/res/',
+    iconsPath : (settings.RESOURCE_PATH + '/' + settings.ICON_DIR + '/android/').replace('//', '/'),
+    platformIconsPath:  'platforms/android/res/',
     icons : [
       { name : 'drawable/icon.png',       size : 96 },
       { name : 'drawable-hdpi/icon.png',  size : 72 },
@@ -58,7 +63,8 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'windows',
     isAdded : fs.existsSync('platforms/windows'),
-    iconsPath : 'platforms/windows/images/',
+    iconsPath : (settings.RESOURCE_PATH + '/' + settings.ICON_DIR + '/windows/').replace('//', '/'),
+    platformIconsPath: 'platforms/windows/images/',
     icons : [
       { name : 'StoreLogo.scale-100.png', size : 50  },
       { name : 'StoreLogo.scale-125.png', size : 63  },
@@ -110,6 +116,9 @@ var getPlatforms = function (projectName) {
 var settings = {};
 settings.CONFIG_FILE = 'config.xml';
 settings.ICON_FILE   = 'icon.png';
+settings.RESOURCE_PATH = 'config/res'; // without trailing slash
+settings.ICON_DIR = 'icon'; // without slashes
+settings.USE_PLATFORMS_PATH = false; // true to use platforms path
 
 /**
  * @var {Object} console utils
@@ -155,8 +164,8 @@ var getProjectName = function () {
 /**
  * Resizes, crops (if needed) and creates a new icon in the platform's folder.
  *
- * @param  {Object} platform
- * @param  {Object} icon
+ * @param {Object} platform
+ * @param {Object} icon
  * @return {Promise}
  */
 var generateIcon = function (platform, icon) {
@@ -166,7 +175,8 @@ var generateIcon = function (platform, icon) {
   if (fs.existsSync(platformPath)) {
     srcPath = platformPath;
   }
-  var dstPath = platform.iconsPath + icon.name;
+  var dstPath = (settings.USE_PLATFORMS_PATH ?
+	  platform.platformIconsPath : platform.iconsPath) + icon.name;
   var dst = path.dirname(dstPath);
   if (!fs.existsSync(dst)) {
     wrench.mkdirSyncRecursive(dst);
@@ -183,7 +193,7 @@ var generateIcon = function (platform, icon) {
       deferred.reject(err);
     } else {
       deferred.resolve();
-      display.success(icon.name + ' created');
+      display.success(icon.name + ' created [' + dstPath + ']');
     }
   });
   if (icon.height) {
@@ -209,7 +219,7 @@ var generateIcon = function (platform, icon) {
 /**
  * Generates icons based on the platform object
  *
- * @param  {Object} platform
+ * @param {Object} platform
  * @return {Promise}
  */
 var generateIconsForPlatform = function (platform) {
@@ -225,7 +235,7 @@ var generateIconsForPlatform = function (platform) {
 /**
  * Goes over all the platforms and triggers icon generation
  *
- * @param  {Array} platforms
+ * @param {Array} platforms
  * @return {Promise}
  */
 var generateIcons = function (platforms) {
@@ -247,7 +257,8 @@ var generateIcons = function (platforms) {
 /**
  * Checks if at least one platform was added to the project
  *
- * @return {Promise} resolves if at least one platform was found, rejects otherwise
+ * @return {Promise} resolves if at least one platform was found, rejects
+ otherwise
  */
 var atLeastOnePlatformFound = function () {
   var deferred = Q.defer();
@@ -303,6 +314,35 @@ var configFileExists = function () {
   });
   return deferred.promise;
 };
+
+/**
+ * parse command line options
+ */
+var parseOptions = function() {
+  var switches = [
+     ['-h', '--help', 'Show this help'],
+     ['-p', '--path PATH', 'resource path, defaults to ' + settings.RESOURCE_PATH],
+     ['-i', '--icon DIR', 'icon directory in PATH, defaults to ' + settings.ICON_DIR],
+     ['-c', '--compat', 'uses default path in platforms (backwards compatibility, overrides -p and -i)'],
+  ];
+  var parser = new optparse.OptionParser(switches);
+  parser.on('help', function() {
+	console.log(parser.toString());
+	process.exit();
+  });
+  parser.on('path', function(opt, path) {
+	settings.RESOURCE_PATH = path;
+  });
+  parser.on('icon', function(opt, path) {
+	settings.SCREEN_DIR = path;
+  });
+  parser.on('compat', function() {
+	settings.USE_PLATFORMS_PATH = true;
+  });
+  parser.parse(process.argv);
+}
+
+parseOptions();
 
 display.header('Checking Project & Icon');
 

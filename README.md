@@ -23,11 +23,24 @@ Then run:
 
      $ cordova-icon
 
+You may specify the output path and directory as follows:
+
+    # output to path/to/res/icon
+    $ cordova-splash -p path/to/res icon   
+          
+WARNING: If you were using a previous version of cordova-icon and expect the generated files to be in their respective ./platforms
+path, use the compability mode:
+
+    $ cordova-icon -c
+    
+This will override the -p and -i settings.
+
 For good results, your file shoud be:
 
 - square
 - for Android and iOS, at least 192\*192px (512\*512px recommended to be future-proof)
 - for Windows, at least 1240\*1240px
+
 
 ### Creating a cordova-cli hook
 
