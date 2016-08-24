@@ -2,7 +2,7 @@
 
 <img src="cordova-icon-resize.png"/>
 
-Automatic icon resizing for Cordova. Create an icon in the root folder of your Cordova project and use cordova-icon to automatically resize and copy it for all the platforms your project supports (currenty works with iOS, Android and Windows 10).
+Automatic icon resizing for Cordova. Create an icon in the root folder of your Cordova project and use cordova-icon to automatically resize and copy it for all the platforms your project supports (currenty works with iOS, Android, Windows 10 and OSX).
 
 ### Installation
 
@@ -23,11 +23,15 @@ Then run:
 
      $ cordova-icon
 
- Specify a different location for your `config.xml` or `icon.png`
+You also can specify manually a location for your `config.xml` or `icon.png`:
 
      $ cordova-icon --config=config.xml --icon=icon.png
 
-For good results, your file shoud be:
+If you run a old version of Cordova for iOS / Mac and you need your files in `/Resources/icons/`, use this option:
+
+     $ cordova-icon --xcode-old
+
+For good results, your file should be:
 
 - square
 - for Android and iOS, at least 192\*192px (512\*512px recommended to be future-proof)
