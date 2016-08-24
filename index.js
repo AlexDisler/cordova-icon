@@ -148,10 +148,12 @@ var getProjectName = function () {
   var parser = new xml2js.Parser();
   data = fs.readFile(settings.CONFIG_FILE, function (err, data) {
     if (err) {
+      display.error('Cannot read config file');
       deferred.reject(err);
     }
     parser.parseString(data, function (err, result) {
       if (err) {
+        display.error('Parse string fails');
         deferred.reject(err);
       }
       var projectName = result.widget.name[0];
@@ -169,18 +171,29 @@ var getProjectName = function () {
  * @return {Promise}
  */
 var generateIcon = function (platform, icon) {
+  console.log('-----------generateIcon gets called\n');
   var deferred = Q.defer();
   var srcPath = settings.ICON_FILE;
   var platformPath = srcPath.replace(/\.png$/, '-' + platform.name + '.png');
+  console.log('------------variables assignments are correct');
   if (fs.existsSync(platformPath)) {
     srcPath = platformPath;
   }
+  console.log(`-----------srcPath value is ${srcPath}.\n`);
   var dstPath = (settings.USE_PLATFORMS_PATH ?
 	  platform.platformIconsPath : platform.iconsPath) + icon.name;
+  console.log(`-----------dstPath value is ${dstPath}.\n`);
   var dst = path.dirname(dstPath);
+  console.log(`-----------dst value is ${dst}.\n`);
   if (!fs.existsSync(dst)) {
-    wrench.mkdirSyncRecursive(dst);
+    console.log(`------------ fs.existsSync(dst) value is ${fs.existsSync(dst)}`);
+    try {
+      wrench.mkdirSyncRecursive(dst);
+    } catch (err) {
+      console.log(`---------------The error is ${err}`);
+    }
   }
+  console.log('-----------Directories are created correctly.\n');
   ig.resize({
     srcPath: srcPath,
     dstPath: dstPath,
@@ -190,6 +203,7 @@ var generateIcon = function (platform, icon) {
     height: icon.size
   } , function(err, stdout, stderr){
     if (err) {
+      display.error('the resizing operations has encountered a problem\n.');
       deferred.reject(err);
     } else {
       deferred.resolve();
@@ -213,6 +227,7 @@ var generateIcon = function (platform, icon) {
       }
     });
   }
+  console.log('---------------GenerateIcon is successful.\n');
   return deferred.promise;
 };
 
@@ -226,9 +241,11 @@ var generateIconsForPlatform = function (platform) {
   display.header('Generating Icons for ' + platform.name);
   var all = [];
   var icons = platform.icons;
+  console.log('---------platform variable assignements are correct.\n');
   icons.forEach(function (icon) {
     all.push(generateIcon(platform, icon));
   });
+  console.log('---------All icons are generated successfully.\n');
   return Promise.all(all);
 };
 
@@ -242,6 +259,7 @@ var generateIcons = function (platforms) {
   var deferred = Q.defer();
   var sequence = Q();
   var all = [];
+  console.log('------This gets called\n');
   _(platforms).where({ isAdded : true }).forEach(function (platform) {
     sequence = sequence.then(function () {
       return generateIconsForPlatform(platform);
@@ -266,6 +284,8 @@ var atLeastOnePlatformFound = function () {
     var activePlatforms = _(platforms).where({ isAdded : true });
     if (activePlatforms.length > 0) {
       display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
+      deferred.resolve();
+    } else if (!settings.USE_PLATFORMS_PATH) {
       deferred.resolve();
     } else {
       display.error('No cordova platforms found.' +
