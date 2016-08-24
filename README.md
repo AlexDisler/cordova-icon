@@ -23,6 +23,10 @@ Then run:
 
      $ cordova-icon
 
+ Specify a different location for your `config.xml` or `icon.png`
+
+     $ cordova-icon --config=config.xml --icon=icon.png
+
 For good results, your file shoud be:
 
 - square
