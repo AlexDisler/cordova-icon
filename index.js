@@ -156,7 +156,7 @@ display.header = function (str) {
 var getProjectName = function () {
   var deferred = Q.defer();
   var parser = new xml2js.Parser();
-  data = fs.readFile(settings.CONFIG_FILE, function (err, data) {
+  fs.readFile(settings.CONFIG_FILE, function (err, data) {
     if (err) {
       deferred.reject(err);
     }
@@ -276,10 +276,10 @@ var atLeastOnePlatformFound = function () {
       display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
       deferred.resolve();
     } else {
-      display.error('No cordova platforms found.' +
-                    'Make sure you are in the root folder of your Cordova project' +
-                      'and add platforms with \'cordova platform add\'');
-                      deferred.reject();
+      display.error('No cordova platforms found. ' +
+                    'Make sure you are in the root folder of your Cordova project ' +
+                    'and add platforms with \'cordova platform add\'');
+      deferred.reject();
     }
   });
   return deferred.promise;
