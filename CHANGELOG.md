@@ -2,6 +2,15 @@
 All notable changes to this project [will be documented](http://keepachangelog.com/) in this file.
 This project *tries to* adhere to [Semantic Versioning](http://semver.org/).
 
+## [0.9.0] - 2016-08-24
+- Add optional config and icon CLI args (#78)
+- Support for OSX platform (#73)
+- Use `fs-extra` instead of `wrench`
+- Ability to choose output for xcode-related images
+
+## [0.8.0]
+- (*Please ignore this version*)
+
 ## [0.7.0] - 2016-04-05
 - Use wrench to prevent issues with directory creation (e150cc1)
 
