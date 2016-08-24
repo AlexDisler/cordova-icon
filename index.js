@@ -8,6 +8,14 @@ var Q      = require('q');
 var argv   = require('minimist')(process.argv.slice(2));
 
 /**
+ * @var {Object} settings - names of the config file and of the icon image
+ */
+var settings = {};
+settings.CONFIG_FILE = argv.config || 'config.xml';
+settings.ICON_FILE = argv.icon || 'icon.png';
+settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
+
+/**
  * Check which platforms are added to the project and return their icon names and sizes
  *
  * @param  {String} projectName
@@ -16,11 +24,17 @@ var argv   = require('minimist')(process.argv.slice(2));
 var getPlatforms = function (projectName) {
   var deferred = Q.defer();
   var platforms = [];
+  var xcodeFolder = '/Images.xcassets/AppIcon.appiconset/';
+
+  if (settings.OLD_XCODE_PATH) {
+    xcodeFolder = '/Resources/icons/';
+  }
+
   platforms.push({
     name : 'ios',
     // TODO: use async fs.exists
     isAdded : fs.existsSync('platforms/ios'),
-    iconsPath : 'platforms/ios/' + projectName + '/Resources/icons/',
+    iconsPath : 'platforms/ios/' + projectName + xcodeFolder,
     icons : [
       { name : 'icon-40.png',       size : 40  },
       { name : 'icon-40@2x.png',    size : 80  },
@@ -59,7 +73,7 @@ var getPlatforms = function (projectName) {
     name : 'osx',
     // TODO: use async fs.exists
     isAdded : fs.existsSync('platforms/osx'),
-    iconsPath : 'platforms/osx/' + projectName + '/Images.xcassets/AppIcon.appiconset/',
+    iconsPath : 'platforms/osx/' + projectName + xcodeFolder,
     icons : [
       { name : 'icon-16x16.png',    size : 16  },
       { name : 'icon-32x32.png',    size : 32  },
@@ -115,14 +129,6 @@ var getPlatforms = function (projectName) {
   deferred.resolve(platforms);
   return deferred.promise;
 };
-
-
-/**
- * @var {Object} settings - names of the config file and of the icon image
- */
-var settings = {};
-settings.CONFIG_FILE = argv.config || 'config.xml';
-settings.ICON_FILE   = argv.icon || 'icon.png';
 
 /**
  * @var {Object} console utils
