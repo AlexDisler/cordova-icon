@@ -31,8 +31,7 @@
     "imagemagick": "^0.1.3",
     "minimist": "^1.2.0",
     "q": "^1.0.1",
-    "underscore": "^1.6.0",
-    "wrench": "^1.5.8",
+    "underscore": "^1.6.0"
     "xml2js": "^0.4.3"
   }
 }
