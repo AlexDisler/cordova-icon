@@ -60,49 +60,51 @@ var getPlatforms = function (projectName) {
       { name : 'drawable-xxxhdpi/icon.png', size : 192 }
     ]
   });
-  platforms.push({
-    name : 'windows',
-    isAdded : fs.existsSync('platforms/windows'),
-    iconsPath : (settings.RESOURCE_PATH + '/' + settings.ICON_DIR + '/windows/').replace('//', '/'),
-    platformIconsPath: 'platforms/windows/images/',
-    icons : [
-      { name : 'StoreLogo.scale-100.png', size : 50  },
-      { name : 'StoreLogo.scale-125.png', size : 63  },
-      { name : 'StoreLogo.scale-150.png', size : 75  },
-      { name : 'StoreLogo.scale-200.png', size : 100 },
-      { name : 'StoreLogo.scale-400.png', size : 200 },
+  if (settings.WINDOWS) {
+    platforms.push({
+      name : 'windows',
+      isAdded : fs.existsSync('platforms/windows'),
+      iconsPath : (settings.RESOURCE_PATH + '/' + settings.ICON_DIR + '/windows/').replace('//', '/'),
+      platformIconsPath: 'platforms/windows/images/',
+      icons : [
+        { name : 'StoreLogo.scale-100.png', size : 50  },
+        { name : 'StoreLogo.scale-125.png', size : 63  },
+        { name : 'StoreLogo.scale-150.png', size : 75  },
+        { name : 'StoreLogo.scale-200.png', size : 100 },
+        { name : 'StoreLogo.scale-400.png', size : 200 },
 
-      { name : 'Square44x44Logo.scale-100.png', size : 44  },
-      { name : 'Square44x44Logo.scale-125.png', size : 55  },
-      { name : 'Square44x44Logo.scale-150.png', size : 66  },
-      { name : 'Square44x44Logo.scale-200.png', size : 88  },
-      { name : 'Square44x44Logo.scale-400.png', size : 176 },
+        { name : 'Square44x44Logo.scale-100.png', size : 44  },
+        { name : 'Square44x44Logo.scale-125.png', size : 55  },
+        { name : 'Square44x44Logo.scale-150.png', size : 66  },
+        { name : 'Square44x44Logo.scale-200.png', size : 88  },
+        { name : 'Square44x44Logo.scale-400.png', size : 176 },
 
-      { name : 'Square71x71Logo.scale-100.png', size : 71  },
-      { name : 'Square71x71Logo.scale-125.png', size : 89  },
-      { name : 'Square71x71Logo.scale-150.png', size : 107 },
-      { name : 'Square71x71Logo.scale-200.png', size : 142 },
-      { name : 'Square71x71Logo.scale-400.png', size : 284 },
+        { name : 'Square71x71Logo.scale-100.png', size : 71  },
+        { name : 'Square71x71Logo.scale-125.png', size : 89  },
+        { name : 'Square71x71Logo.scale-150.png', size : 107 },
+        { name : 'Square71x71Logo.scale-200.png', size : 142 },
+        { name : 'Square71x71Logo.scale-400.png', size : 284 },
 
-      { name : 'Square150x150Logo.scale-100.png', size : 150 },
-      { name : 'Square150x150Logo.scale-125.png', size : 188 },
-      { name : 'Square150x150Logo.scale-150.png', size : 225 },
-      { name : 'Square150x150Logo.scale-200.png', size : 300 },
-      { name : 'Square150x150Logo.scale-400.png', size : 600 },
+        { name : 'Square150x150Logo.scale-100.png', size : 150 },
+        { name : 'Square150x150Logo.scale-125.png', size : 188 },
+        { name : 'Square150x150Logo.scale-150.png', size : 225 },
+        { name : 'Square150x150Logo.scale-200.png', size : 300 },
+        { name : 'Square150x150Logo.scale-400.png', size : 600 },
 
-      { name : 'Square310x310Logo.scale-100.png', size : 310  },
-      { name : 'Square310x310Logo.scale-125.png', size : 388  },
-      { name : 'Square310x310Logo.scale-150.png', size : 465  },
-      { name : 'Square310x310Logo.scale-200.png', size : 620  },
-      { name : 'Square310x310Logo.scale-400.png', size : 1240 },
+        { name : 'Square310x310Logo.scale-100.png', size : 310  },
+        { name : 'Square310x310Logo.scale-125.png', size : 388  },
+        { name : 'Square310x310Logo.scale-150.png', size : 465  },
+        { name : 'Square310x310Logo.scale-200.png', size : 620  },
+        { name : 'Square310x310Logo.scale-400.png', size : 1240 },
 
-      { name : 'Wide310x150Logo.scale-100.png', size : 310, height : 150  },
-      { name : 'Wide310x150Logo.scale-125.png', size : 388, height : 188  },
-      { name : 'Wide310x150Logo.scale-150.png', size : 465, height : 225  },
-      { name : 'Wide310x150Logo.scale-200.png', size : 620, height : 300  },
-      { name : 'Wide310x150Logo.scale-400.png', size : 1240, height : 600 }
-    ]
-  });
+        { name : 'Wide310x150Logo.scale-100.png', size : 310, height : 150  },
+        { name : 'Wide310x150Logo.scale-125.png', size : 388, height : 188  },
+        { name : 'Wide310x150Logo.scale-150.png', size : 465, height : 225  },
+        { name : 'Wide310x150Logo.scale-200.png', size : 620, height : 300  },
+        { name : 'Wide310x150Logo.scale-400.png', size : 1240, height : 600 }
+      ]
+    });
+  }
   // TODO: add missing platforms
   deferred.resolve(platforms);
   return deferred.promise;
@@ -119,6 +121,7 @@ settings.ICON_FILE   = 'icon.png';
 settings.RESOURCE_PATH = 'config/res'; // without trailing slash
 settings.ICON_DIR = 'icon'; // without slashes
 settings.USE_PLATFORMS_PATH = false; // true to use platforms path
+settings.WINDOWS = false;
 
 /**
  * @var {Object} console utils
@@ -329,6 +332,7 @@ var parseOptions = function() {
      ['-p', '--path PATH', 'resource path, defaults to ' + settings.RESOURCE_PATH],
      ['-i', '--icon DIR', 'icon directory in PATH, defaults to ' + settings.ICON_DIR],
      ['-c', '--compat', 'uses default path in platforms (backwards compatibility, overrides -p and -i)'],
+     ['-w', '--windows', 'generate windows icons as well, will not by default.']
   ];
   var parser = new optparse.OptionParser(switches);
   parser.on('help', function() {
@@ -343,6 +347,9 @@ var parseOptions = function() {
   });
   parser.on('compat', function() {
 	settings.USE_PLATFORMS_PATH = true;
+  });
+  parser.on('windows', function() {
+    settings.WINDOWS = true;
   });
   parser.parse(process.argv);
 }
