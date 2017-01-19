@@ -108,7 +108,7 @@ var getPlatforms = function (projectName) {
       { name : 'Square44x44Logo.scale-140.png', size : 62  },
       { name : 'Square44x44Logo.scale-150.png', size : 66  },
       { name : 'Square44x44Logo.scale-200.png', size : 88  },
-      { name : 'Square44x44Logo.scale-240.png', size : 170  },
+      { name : 'Square44x44Logo.scale-240.png', size : 106  },
       { name : 'Square44x44Logo.scale-400.png', size : 176 },
 
       { name : 'Square71x71Logo.scale-100.png', size : 71  },
