@@ -46,7 +46,7 @@ For good results, your file should be:
 #### Notes:
 
 - Your `config.ml` file will not be updated by the tool (because images are automatically created in the good folders)
-- Therefore, in your `config.xml`, be sure to remove all lines looking like `<splash src="res/screen/android/splash-land-mdpi.png" density="land-mdpi"/>`
+- Therefore, in your `config.xml`, be sure to remove all lines looking like `<icon src="res/android/ldpi.png" density="ldpi" />`
 
 ### Creating a cordova-cli hook
 
