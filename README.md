@@ -9,7 +9,7 @@ Automatic icon resizing for Cordova. Create an icon in the root folder of your C
 ```bash
 $ sudo apt-get install imagemagick
 $ # on Mac: brew install imagemagick
-$ # on Windows: http://www.imagemagick.org/script/binary-releases.php#windows
+$ # on Windows: http://www.imagemagick.org/script/binary-releases.php#windows (check "Legacy tools")
 
 $ sudo npm install cordova-icon -g
 ```
@@ -42,6 +42,11 @@ For good results, your file should be:
 - square
 - for Android and iOS, at least 192\*192px (512\*512px recommended to be future-proof)
 - for Windows, at least 1240\*1240px
+
+#### Notes:
+
+- Your `config.ml` file will not be updated by the tool (because images are automatically created in the good folders)
+- Therefore, in your `config.xml`, be sure to remove all lines looking like `<splash src="res/screen/android/splash-land-mdpi.png" density="land-mdpi"/>`
 
 ### Creating a cordova-cli hook
 
