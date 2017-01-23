@@ -2,6 +2,9 @@
 All notable changes to this project [will be documented](http://keepachangelog.com/) in this file.
 This project *tries to* adhere to [Semantic Versioning](http://semver.org/).
 
+## [0.9.2] - 2017-01-23
+- Add missing Windows 8 sizes (#91)
+
 ## [0.9.1] - 2016-11-09
 - Add missing files for Android SDK 24+ and Cordova 6.4.0 (#85)
 
