@@ -40,7 +40,7 @@ If you run a old version of Cordova for iOS / Mac and you need your files in `/R
 For good results, your file should be:
 
 - square
-- for Android and iOS, at least 192\*192px (512\*512px recommended to be future-proof)
+- for Android, at least 1024\*1024px
 - for Windows, at least 1240\*1240px
 
 #### Notes:
