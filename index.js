@@ -14,6 +14,7 @@ var settings = {};
 settings.CONFIG_FILE = argv.config || 'config.xml';
 settings.ICON_FILE = argv.icon || 'icon.png';
 settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
+settings.NEW_ICON_NAME = argv.output || 'icon';
 
 /**
  * Check which platforms are added to the project and return their icon names and sizes
@@ -71,19 +72,19 @@ var getPlatforms = function (projectName) {
     isAdded : fs.existsSync('platforms/android'),
     iconsPath : 'platforms/android/res/',
     icons : [
-      { name : 'drawable/icon.png',       size : 96 },
-      { name : 'drawable-hdpi/icon.png',  size : 72 },
-      { name : 'drawable-ldpi/icon.png',  size : 36 },
-      { name : 'drawable-mdpi/icon.png',  size : 48 },
-      { name : 'drawable-xhdpi/icon.png', size : 96 },
-      { name : 'drawable-xxhdpi/icon.png', size : 144 },
-      { name : 'drawable-xxxhdpi/icon.png', size : 192 },
-      { name : 'mipmap-hdpi/icon.png',  size : 72 },
-      { name : 'mipmap-ldpi/icon.png',  size : 36 },
-      { name : 'mipmap-mdpi/icon.png',  size : 48 },
-      { name : 'mipmap-xhdpi/icon.png', size : 96 },
-      { name : 'mipmap-xxhdpi/icon.png', size : 144 },
-      { name : 'mipmap-xxxhdpi/icon.png', size : 192 }
+      { name : 'drawable/' + settings.NEW_ICON_NAME + '.png',       size : 96 },
+      { name : 'drawable-hdpi/' + settings.NEW_ICON_NAME + '.png',  size : 72 },
+      { name : 'drawable-ldpi/' + settings.NEW_ICON_NAME + '.png',  size : 36 },
+      { name : 'drawable-mdpi/' + settings.NEW_ICON_NAME + '.png',  size : 48 },
+      { name : 'drawable-xhdpi/' + settings.NEW_ICON_NAME + '.png', size : 96 },
+      { name : 'drawable-xxhdpi/' + settings.NEW_ICON_NAME + '.png', size : 144 },
+      { name : 'drawable-xxxhdpi/' + settings.NEW_ICON_NAME + '.png', size : 192 },
+      { name : 'mipmap-hdpi/' + settings.NEW_ICON_NAME + '.png',  size : 72 },
+      { name : 'mipmap-ldpi/' + settings.NEW_ICON_NAME + '.png',  size : 36 },
+      { name : 'mipmap-mdpi/' + settings.NEW_ICON_NAME + '.png',  size : 48 },
+      { name : 'mipmap-xhdpi/' + settings.NEW_ICON_NAME + '.png', size : 96 },
+      { name : 'mipmap-xxhdpi/' + settings.NEW_ICON_NAME + '.png', size : 144 },
+      { name : 'mipmap-xxxhdpi/' + settings.NEW_ICON_NAME + '.png', size : 192 }
     ]
   });
   platforms.push({
@@ -337,6 +338,25 @@ var validIconExists = function () {
 };
 
 /**
+ * Checks if a valid output icon file name has been given.
+ *
+ * @return {Promise} resolves if exists, rejects otherwise
+ */
+var validOutputExists = function () {
+  var deferred = Q.defer();
+  var reg = /^[a-z0-9_]*$/g; // File-based resource names must contain only lowercase a-z, 0-9, or underscore
+  var test = reg.exec(settings.NEW_ICON_NAME); // returns null if match fails.
+  if (test) {
+    display.success(settings.NEW_ICON_NAME + ' exists and has the correct format');
+    deferred.resolve();
+  } else {
+    display.error(settings.NEW_ICON_NAME + ' has the incorrect format, file-based resource names must contain only lowercase a-z, 0-9, or underscore');
+    deferred.reject();
+  }
+  return deferred.promise;
+};
+
+/**
  * Checks if a config.xml file exists
  *
  * @return {Promise} resolves if exists, rejects otherwise
@@ -359,6 +379,7 @@ display.header('Checking Project & Icon');
 
 atLeastOnePlatformFound()
   .then(validIconExists)
+  .then(validOutputExists)
   .then(configFileExists)
   .then(getProjectName)
   .then(getPlatforms)
