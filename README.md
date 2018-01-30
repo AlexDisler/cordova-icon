@@ -33,12 +33,18 @@ You also can specify manually a location for your `config.xml` or `icon.png`:
 
      $ cordova-icon --config=config.xml --icon=icon.png
 
+You may specify the output path and directory as follows:
+
+    # output to path/to/res/icon
+    $ cordova-icon --path path/to/res --icon-dir icon
+    
+This will generate icons in the --path and --icon-dir paths instead of each cordova platforms folders. 
+
 If you run a old version of Cordova for iOS / Mac and you need your files in `/Resources/icons/`, use this option:
 
      $ cordova-icon --xcode-old
 
 For good results, your file should be:
-
 - square
 - for Android and iOS, at least 1024\*1024px
 - for Windows, at least 1240\*1240px
