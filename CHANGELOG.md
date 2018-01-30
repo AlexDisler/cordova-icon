@@ -5,7 +5,7 @@ This project *tries to* adhere to [Semantic Versioning](http://semver.org/).
 ## [0.9.x] -
 - Add --help option
 - Ability to specify resource output path via --path
-- Ability to specify resource icon output path via --icon
+- Ability to specify resource icon output path via --icon-dir
 
 ## [0.9.2] - 2017-01-23
 - Add missing Windows 8 sizes (#91)
