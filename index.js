@@ -6,7 +6,6 @@ var colors = require('colors');
 var _      = require('underscore');
 var Q      = require('q');
 var argv   = require('minimist')(process.argv.slice(2));
-var semver = require('semver');
 
 /**
  * @var {Object} settings - names of the config file and of the icon image
@@ -15,22 +14,6 @@ var settings = {};
 settings.CONFIG_FILE = argv.config || 'config.xml';
 settings.ICON_FILE = argv.icon || 'icon.png';
 settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
-
-
-/**
- * Get Android Folder based on Android Platform version
- */
-var getAndroidFolder = function(){
-  var androidFolder = 'platforms/android/app/src/main/res/'; //as of cordova-android@7.0.0
-  if(!fs.existsSync('platforms/android/cordova/version')){
-    return androidFolder;
-  }
-  if(semver.lt(require('../../platforms/android/cordova/version').version, '7.0.0')){
-    androidFolder = 'platforms/android/res/';
-  }
-  return androidFolder;
-}
-
 
 /**
  * Check which platforms are added to the project and return their icon names and sizes
@@ -86,7 +69,7 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'android',
     isAdded : fs.existsSync('platforms/android'),
-    iconsPath : getAndroidFolder(),
+    iconsPath : 'platforms/android/res/',
     icons : [
       { name : 'drawable/icon.png',       size : 96 },
       { name : 'drawable-hdpi/icon.png',  size : 72 },
