@@ -5,20 +5,25 @@ var ig     = require('imagemagick');
 var colors = require('colors');
 var _      = require('underscore');
 var Q      = require('q');
-var argv   = require('minimist')(process.argv.slice(2));
+var optparse = require('optparse');
 
 /**
  * @var {Object} settings - names of the config file and of the icon image
  */
 var settings = {};
-settings.CONFIG_FILE = argv.config || 'config.xml';
-settings.ICON_FILE = argv.icon || 'icon.png';
-settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
+settings.CONFIG_FILE = 'config.xml';
+settings.ICON_FILE = 'icon.png';
+settings.OLD_XCODE_PATH = false;
+settings.RESOURCE_PATH = 'config/res'; // without trailing slash
+settings.ICON_DIR = 'icon'; // without slashes
+settings.USE_PLATFORMS_PATH = true; // true to use platforms path
 
 /**
- * Check which platforms are added to the project and return their icon names and sizes
- *
- * @param  {String} projectName
+ * Check which platforms are added to the project and return their icon names
+ * and sizes
+ * 
+ * @param {String}
+ *            projectName
  * @return {Promise} resolves with an array of platforms
  */
 var getPlatforms = function (projectName) {
@@ -34,7 +39,8 @@ var getPlatforms = function (projectName) {
     name : 'ios',
     // TODO: use async fs.exists
     isAdded : fs.existsSync('platforms/ios'),
-    iconsPath : 'platforms/ios/' + projectName + xcodeFolder,
+    iconsPath : (settings.RESOURCE_PATH + '/' + settings.ICON_DIR + '/ios/').replace('//', '/'),
+    platformIconsPath: 'platforms/ios/' + projectName + xcodeFolder,
     icons : [
       { name: 'icon-20.png',             size : 20   },
       { name: 'icon-20@2x.png',          size : 40   },
@@ -69,7 +75,8 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'android',
     isAdded : fs.existsSync('platforms/android'),
-    iconsPath : 'platforms/android/res/',
+    iconsPath : (settings.RESOURCE_PATH + '/' + settings.ICON_DIR + '/android/').replace('//', '/'),
+    platformIconsPath:  'platforms/android/res/',
     icons : [
       { name : 'drawable/icon.png',       size : 96 },
       { name : 'drawable-hdpi/icon.png',  size : 72 },
@@ -103,7 +110,8 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'windows',
     isAdded : fs.existsSync('platforms/windows'),
-    iconsPath : 'platforms/windows/images/',
+    iconsPath : (settings.RESOURCE_PATH + '/' + settings.ICON_DIR + '/windows/').replace('//', '/'),
+    platformIconsPath: 'platforms/windows/images/',
     icons : [
       { name : 'StoreLogo.scale-100.png', size : 50  },
       { name : 'StoreLogo.scale-125.png', size : 63  },
@@ -182,7 +190,7 @@ display.header = function (str) {
 
 /**
  * read the config file and get the project name
- *
+ * 
  * @return {Promise} resolves to a string - the project's name
  */
 var getProjectName = function () {
@@ -205,9 +213,11 @@ var getProjectName = function () {
 
 /**
  * Resizes, crops (if needed) and creates a new icon in the platform's folder.
- *
- * @param  {Object} platform
- * @param  {Object} icon
+ * 
+ * @param {Object}
+ *            platform
+ * @param {Object}
+ *            icon
  * @return {Promise}
  */
 var generateIcon = function (platform, icon) {
@@ -217,7 +227,8 @@ var generateIcon = function (platform, icon) {
   if (fs.existsSync(platformPath)) {
     srcPath = platformPath;
   }
-  var dstPath = platform.iconsPath + icon.name;
+  var dstPath = (settings.USE_PLATFORMS_PATH ? 
+	  platform.platformIconsPath : platform.iconsPath) + icon.name;
   var dst = path.dirname(dstPath);
   if (!fs.existsSync(dst)) {
     fs.mkdirsSync(dst);
@@ -234,7 +245,7 @@ var generateIcon = function (platform, icon) {
       deferred.reject(err);
     } else {
       deferred.resolve();
-      display.success(icon.name + ' created');
+      display.success(icon.name + ' created [' + dstPath + ']');
     }
   });
   if (icon.height) {
@@ -259,8 +270,9 @@ var generateIcon = function (platform, icon) {
 
 /**
  * Generates icons based on the platform object
- *
- * @param  {Object} platform
+ * 
+ * @param {Object}
+ *            platform
  * @return {Promise}
  */
 var generateIconsForPlatform = function (platform) {
@@ -275,8 +287,9 @@ var generateIconsForPlatform = function (platform) {
 
 /**
  * Goes over all the platforms and triggers icon generation
- *
- * @param  {Array} platforms
+ * 
+ * @param {Array}
+ *            platforms
  * @return {Promise}
  */
 var generateIcons = function (platforms) {
@@ -297,8 +310,9 @@ var generateIcons = function (platforms) {
 
 /**
  * Checks if at least one platform was added to the project
- *
- * @return {Promise} resolves if at least one platform was found, rejects otherwise
+ * 
+ * @return {Promise} resolves if at least one platform was found, rejects
+ *         otherwise
  */
 var atLeastOnePlatformFound = function () {
   var deferred = Q.defer();
@@ -319,7 +333,7 @@ var atLeastOnePlatformFound = function () {
 
 /**
  * Checks if a valid icon file exists
- *
+ * 
  * @return {Promise} resolves if exists, rejects otherwise
  */
 var validIconExists = function () {
@@ -338,7 +352,7 @@ var validIconExists = function () {
 
 /**
  * Checks if a config.xml file exists
- *
+ * 
  * @return {Promise} resolves if exists, rejects otherwise
  */
 var configFileExists = function () {
@@ -354,6 +368,48 @@ var configFileExists = function () {
   });
   return deferred.promise;
 };
+
+/**
+ * parse command line options
+ */
+var parseOptions = function() {
+  var switches = [
+     ['-h', '--help', 'Show this help'],
+     ['-i', '--icon DIR', 'icon file in PATH, defaults to ' + settings.ICON_FILE],
+     ['-c', '--config DIR', 'config file in PATH, defaults to ' + settings.CONFIG_FILE],
+     ['-p', '--path PATH', 'resource path, defaults to ' + settings.RESOURCE_PATH],
+     ['-id', '--icon-dir DIR', 'icon directory in PATH, defaults to ' + settings.ICON_DIR],
+     ['-xo', '--xcode-old', 'use old version of Cordova for iOS and generate file in /Resources/icons/'],
+  ];
+  var parser = new optparse.OptionParser(switches);
+  parser.on('help', function() {
+	console.log(parser.toString());
+	  process.exit();
+  });
+  parser.on('config', function(opt, path) {
+    settings.CONFIG_FILE = path;
+  });
+  parser.on('icon', function(opt, path) {
+    settings.ICON_FILE = path;
+  });
+  parser.on('path', function(opt, path) {
+    // Only update if value provided, otherwise assum default and disable .
+    if (path) {
+      settings.RESOURCE_PATH = path; 
+    }
+    settings.USE_PLATFORMS_PATH = false;
+  });
+  parser.on('icon-dir', function(opt, path) {
+    settings.ICON_DIR = path;
+    settings.USE_PLATFORMS_PATH = false;
+  });
+  parser.on('xcode-old', function() {
+    settings.OLD_XCODE_PATH = true;
+  });
+  parser.parse(process.argv);
+}
+
+parseOptions();
 
 display.header('Checking Project & Icon');
 
