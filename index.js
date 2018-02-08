@@ -14,6 +14,7 @@ var settings = {};
 settings.CONFIG_FILE = argv.config || 'config.xml';
 settings.ICON_FILE = argv.icon || 'icon.png';
 settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
+settings.ICON_1024_BGCOLOR = argv['i1024bg'] || 'white';
 
 /**
  * Check which platforms are added to the project and return their icon names and sizes
@@ -233,8 +234,24 @@ var generateIcon = function (platform, icon) {
     if (err) {
       deferred.reject(err);
     } else {
-      deferred.resolve();
-      display.success(icon.name + ' created');
+      if (icon.name === 'icon-1024.png' && platform.name === 'ios') {
+        // https://stackoverflow.com/questions/2322750/replace-transparency-in-png-images-with-white-background
+        // convert image.png -background white -alpha remove white.png
+
+        ig.convert([dstPath,  '-background', settings.ICON_1024_BGCOLOR, '-alpha', 'remove', dstPath],
+          function(err, stdout){
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve();
+              display.success(icon.name + ' removed image transparency');
+            }
+          });
+
+      } else {
+        deferred.resolve();
+        display.success(icon.name + ' created');
+      }
     }
   });
   if (icon.height) {
