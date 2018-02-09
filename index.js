@@ -22,10 +22,12 @@ settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
  */
 var getAndroidFolder = function(){
   var androidFolder = 'platforms/android/app/src/main/res/'; //as of cordova-android@7.0.0
-  if(!fs.existsSync('platforms/android/cordova/version')){
+  var versionAbsolutePath = path.resolve(process.cwd(), 'platforms/android/cordova/version');
+
+  if(!fs.existsSync(versionAbsolutePath)){
     return androidFolder;
   }
-  if(semver.lt(require('../../platforms/android/cordova/version').version, '7.0.0')){
+  if(semver.lt(require(versionAbsolutePath).version, '7.0.0')){
     androidFolder = 'platforms/android/res/';
   }
   return androidFolder;
