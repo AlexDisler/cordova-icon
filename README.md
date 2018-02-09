@@ -13,6 +13,11 @@ $ # on Windows: http://www.imagemagick.org/script/binary-releases.php#windows (c
 
 $ sudo npm install cordova-icon -g
 ```
+If you are using an older version of cordova (before 7.x):
+
+```bash
+$ sudo npm install cordova-icon@0.13.0 -g
+```
 
 ### Requirements
 

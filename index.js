@@ -69,7 +69,7 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'android',
     isAdded : fs.existsSync('platforms/android'),
-    iconsPath : 'platforms/android/res/',
+    iconsPath : 'platforms/android/app/src/main/res/',
     icons : [
       { name : 'drawable/icon.png',       size : 96 },
       { name : 'drawable-hdpi/icon.png',  size : 72 },
