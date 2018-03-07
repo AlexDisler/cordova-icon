@@ -289,9 +289,7 @@ var generateIcons = function (platforms) {
     });
     all.push(sequence);
   });
-  Q.all(all).then(function () {
-    deferred.resolve();
-  });
+  Q.all(all).then(deferred.resolve).catch(deferred.reject);
   return deferred.promise;
 };
 
