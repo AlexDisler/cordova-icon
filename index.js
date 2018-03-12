@@ -232,6 +232,7 @@ var generateIcon = function (platform, icon) {
   } , function(err, stdout, stderr){
     if (err) {
       deferred.reject(err);
+      display.error('Failed to create ' + icon.name);
     } else {
       deferred.resolve();
       display.success(icon.name + ' created');
@@ -291,6 +292,10 @@ var generateIcons = function (platforms) {
   });
   Q.all(all).then(function () {
     deferred.resolve();
+  }).catch(function (err) {
+    if (err) {
+      deferred.reject(err);  
+    }
   });
   return deferred.promise;
 };
