@@ -14,6 +14,7 @@ var settings = {};
 settings.CONFIG_FILE = argv.config || 'config.xml';
 settings.ICON_FILE = argv.icon || 'icon.png';
 settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
+settings.OLD_ANDROID_PATH = argv['android-old'] || false;
 
 /**
  * Check which platforms are added to the project and return their icon names and sizes
@@ -69,7 +70,7 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'android',
     isAdded : fs.existsSync('platforms/android'),
-    iconsPath : 'platforms/android/app/src/main/res/',
+    iconsPath :  settings.OLD_ANDROID_PATH  ?  'platforms/android/res/' : 'platforms/android/app/src/main/res/',
     icons : [
       { name : 'drawable/icon.png',       size : 96 },
       { name : 'drawable-hdpi/icon.png',  size : 72 },
@@ -197,6 +198,9 @@ var getProjectName = function () {
         deferred.reject(err);
       }
       var projectName = result.widget.name[0];
+      if (typeof projectName == "object") {
+          projectName = projectName._.trim()
+      }
       deferred.resolve(projectName);
     });
   });
