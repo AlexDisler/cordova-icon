@@ -14,6 +14,7 @@ var settings = {};
 settings.CONFIG_FILE = argv.config || 'config.xml';
 settings.ICON_FILE = argv.icon || 'icon.png';
 settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
+settings.ICON_1024_BGCOLOR = argv['i1024bg'] || 'white';
 
 /**
  * Check which platforms are added to the project and return their icon names and sizes
@@ -233,8 +234,24 @@ var generateIcon = function (platform, icon) {
     if (err) {
       deferred.reject(err);
     } else {
-      deferred.resolve();
-      display.success(icon.name + ' created');
+      if (icon.name === 'icon-1024.png' && platform.name === 'ios') {
+        // https://stackoverflow.com/questions/2322750/replace-transparency-in-png-images-with-white-background
+        // convert image.png -background white -alpha remove white.png
+
+        ig.convert([dstPath,  '-background', settings.ICON_1024_BGCOLOR, '-alpha', 'remove', dstPath],
+          function(err, stdout){
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve();
+              display.success(icon.name + ' removed image transparency');
+            }
+          });
+
+      } else {
+        deferred.resolve();
+        display.success(icon.name + ' created');
+      }
     }
   });
   if (icon.height) {
@@ -306,7 +323,7 @@ var atLeastOnePlatformFound = function () {
     var activePlatforms = _(platforms).where({ isAdded : true });
     if (activePlatforms.length > 0) {
       display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
-      deferred.resolve();
+      deferred.resolve(platforms);
     } else {
       display.error('No cordova platforms found. ' +
                     'Make sure you are in the root folder of your Cordova project ' +
@@ -317,49 +334,9 @@ var atLeastOnePlatformFound = function () {
   return deferred.promise;
 };
 
-/**
- * Checks if a valid icon file exists
- *
- * @return {Promise} resolves if exists, rejects otherwise
- */
-var validIconExists = function () {
-  var deferred = Q.defer();
-  fs.exists(settings.ICON_FILE, function (exists) {
-    if (exists) {
-      display.success(settings.ICON_FILE + ' exists');
-      deferred.resolve();
-    } else {
-      display.error(settings.ICON_FILE + ' does not exist');
-      deferred.reject();
-    }
-  });
-  return deferred.promise;
-};
-
-/**
- * Checks if a config.xml file exists
- *
- * @return {Promise} resolves if exists, rejects otherwise
- */
-var configFileExists = function () {
-  var deferred = Q.defer();
-  fs.exists(settings.CONFIG_FILE, function (exists) {
-    if (exists) {
-      display.success(settings.CONFIG_FILE + ' exists');
-      deferred.resolve();
-    } else {
-      display.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist');
-      deferred.reject();
-    }
-  });
-  return deferred.promise;
-};
-
 display.header('Checking Project & Icon');
 
 atLeastOnePlatformFound()
-  .then(validIconExists)
-  .then(configFileExists)
   .then(getProjectName)
   .then(getPlatforms)
   .then(generateIcons)
