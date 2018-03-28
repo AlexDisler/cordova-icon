@@ -86,16 +86,16 @@ Check out [cordova-splash](https://github.com/AlexDisler/cordova-splash)
 
 ### Short Name
 - Observed that cordova-icon did not use the new icon on iOS platform when short name option is added to config.xml.
-i.e. 
-<widget ...>
-   <name short="HiCdv">HelloCordova</name>
-</widget>
-Will result in using default cordova icon.
-- The fix: Do this
-<widget ...>
-   <name>HelloCordova</name>
-   <name short="HiCdv"/>
-</widget>
+          i.e. 
+          <widget ...>
+             <name short="HiCdv">HelloCordova</name>
+          </widget>
+          Will result in using default cordova icon.
+          - The fix: Do this
+          <widget ...>
+             <name>HelloCordova</name>
+             <name short="HiCdv"/>
+          </widget>
 
 
 ### License
