@@ -323,7 +323,7 @@ var atLeastOnePlatformFound = function () {
     var activePlatforms = _(platforms).where({ isAdded : true });
     if (activePlatforms.length > 0) {
       display.success('platforms found: ' + _(activePlatforms).pluck('name').join(', '));
-      deferred.resolve();
+      deferred.resolve(platforms);
     } else {
       display.error('No cordova platforms found. ' +
                     'Make sure you are in the root folder of your Cordova project ' +
@@ -334,49 +334,9 @@ var atLeastOnePlatformFound = function () {
   return deferred.promise;
 };
 
-/**
- * Checks if a valid icon file exists
- *
- * @return {Promise} resolves if exists, rejects otherwise
- */
-var validIconExists = function () {
-  var deferred = Q.defer();
-  fs.exists(settings.ICON_FILE, function (exists) {
-    if (exists) {
-      display.success(settings.ICON_FILE + ' exists');
-      deferred.resolve();
-    } else {
-      display.error(settings.ICON_FILE + ' does not exist');
-      deferred.reject();
-    }
-  });
-  return deferred.promise;
-};
-
-/**
- * Checks if a config.xml file exists
- *
- * @return {Promise} resolves if exists, rejects otherwise
- */
-var configFileExists = function () {
-  var deferred = Q.defer();
-  fs.exists(settings.CONFIG_FILE, function (exists) {
-    if (exists) {
-      display.success(settings.CONFIG_FILE + ' exists');
-      deferred.resolve();
-    } else {
-      display.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist');
-      deferred.reject();
-    }
-  });
-  return deferred.promise;
-};
-
 display.header('Checking Project & Icon');
 
 atLeastOnePlatformFound()
-  .then(validIconExists)
-  .then(configFileExists)
   .then(getProjectName)
   .then(getPlatforms)
   .then(generateIcons)
