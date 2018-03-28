@@ -84,6 +84,24 @@ Check out [cordova-splash](https://github.com/AlexDisler/cordova-splash)
 - [ionic-zoom-view](https://github.com/AlexDisler/ionic-zoom-view) - an easy way to add a zoom view to images using an ionic modal
 - [ng-persist](https://github.com/AlexDisler/ng-persist) - store data on mobile devices (using cordova) that persists even if the user reinstalls the app
 
+### Short Name
+- Observed that cordova-icon did not use the new icon on iOS platform when short name option is added to config.xml.
+          
+i.e. 
+```bash
+<widget ...>
+   <name short="HiCdv">HelloCordova</name>
+</widget>
+```          
+Will result in default cordova icon.
+- The fix: Do this:
+```bash
+<widget ...>
+  <name>HelloCordova</name>
+  <name short="HiCdv"/>
+</widget>
+```
+
 ### License
 
 MIT
