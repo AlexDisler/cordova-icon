@@ -113,6 +113,16 @@ var getPlatforms = function (projectName) {
       { name : 'StoreLogo.scale-200.png', size : 100 },
       { name : 'StoreLogo.scale-240.png', size : 120 },
       { name : 'StoreLogo.scale-400.png', size : 200 },
+      
+      { name : 'Square30x30Logo.scale-80.png', size : 24 },
+      { name : 'Square30x30Logo.scale-100.png', size : 30 },
+      { name : 'Square30x30Logo.scale-140.png', size : 42 },
+      { name : 'Square30x30Logo.scale-180.png', size : 54 },
+
+      { name : 'Square30x30Logo.targetsize-16.png', size : 16 },
+      { name : 'Square30x30Logo.targetsize-32.png', size : 32 },
+      { name : 'Square30x30Logo.targetsize-48.png', size : 48 },
+      { name : 'Square30x30Logo.targetsize-256.png', size : 256 },
 
       { name : 'Square44x44Logo.scale-100.png', size : 44  },
       { name : 'Square44x44Logo.scale-125.png', size : 55  },
@@ -121,6 +131,11 @@ var getPlatforms = function (projectName) {
       { name : 'Square44x44Logo.scale-200.png', size : 88  },
       { name : 'Square44x44Logo.scale-240.png', size : 106  },
       { name : 'Square44x44Logo.scale-400.png', size : 176 },
+      
+      { name : 'Square70x70Logo.scale-80.png', size : 56  },
+      { name : 'Square70x70Logo.scale-100.png', size : 70  },
+      { name : 'Square70x70Logo.scale-140.png', size : 98  },
+      { name : 'Square70x70Logo.scale-180.png', size : 126 },
 
       { name : 'Square71x71Logo.scale-100.png', size : 71  },
       { name : 'Square71x71Logo.scale-125.png', size : 89  },
@@ -130,14 +145,17 @@ var getPlatforms = function (projectName) {
       { name : 'Square71x71Logo.scale-240.png', size : 170 },
       { name : 'Square71x71Logo.scale-400.png', size : 284 },
 
+      { name : 'Square150x150Logo.scale-80.png', size : 120 },
       { name : 'Square150x150Logo.scale-100.png', size : 150 },
       { name : 'Square150x150Logo.scale-125.png', size : 188 },
       { name : 'Square150x150Logo.scale-140.png', size : 210 },
       { name : 'Square150x150Logo.scale-150.png', size : 225 },
+      { name : 'Square150x150Logo.scale-180.png', size : 270 },
       { name : 'Square150x150Logo.scale-200.png', size : 300 },
       { name : 'Square150x150Logo.scale-240.png', size : 360 },
       { name : 'Square150x150Logo.scale-400.png', size : 600 },
 
+      { name : 'Square310x310Logo.scale-80.png', size : 248 },
       { name : 'Square310x310Logo.scale-100.png', size : 310  },
       { name : 'Square310x310Logo.scale-125.png', size : 388  },
       { name : 'Square310x310Logo.scale-140.png', size : 434  },
