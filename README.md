@@ -42,6 +42,14 @@ If you run a old version of Cordova for iOS / Mac and you need your files in `/R
 
      $ cordova-icon --xcode-old
 
+If you want specify what platforms with be generate icons:
+
+    $ cordova-icon --platfoms=ios:windows
+
+In some case you must specify the destiny path to export to icons:
+
+     $ cordova-icon --iconspath=platforms/android/res/ --platfoms=android
+
 For good results, your file should be:
 
 - square
