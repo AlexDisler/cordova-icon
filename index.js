@@ -14,6 +14,7 @@ var settings = {};
 settings.CONFIG_FILE = argv.config || 'config.xml';
 settings.ICON_FILE = argv.icon || 'icon.png';
 settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
+settings.ICONS_PATH = argv['iconspath'] || false;
 
 /**
  * Check which platforms are added to the project and return their icon names and sizes
@@ -34,7 +35,7 @@ var getPlatforms = function (projectName) {
     name : 'ios',
     // TODO: use async fs.exists
     isAdded : fs.existsSync('platforms/ios'),
-    iconsPath : 'platforms/ios/' + projectName + xcodeFolder,
+    iconsPath : (settings.ICONS_PATH || 'platforms/ios/' + projectName + (xcodeFolder)),
     icons : [
       { name: 'icon-20.png',             size : 20   },
       { name: 'icon-20@2x.png',          size : 40   },
@@ -69,7 +70,7 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'android',
     isAdded : fs.existsSync('platforms/android'),
-    iconsPath : 'platforms/android/app/src/main/res/',
+    iconsPath : (settings.ICONS_PATH || ('platforms/android/app/src/main/res/')),
     icons : [
       { name : 'drawable/icon.png',       size : 96 },
       { name : 'drawable-hdpi/icon.png',  size : 72 },
@@ -90,7 +91,7 @@ var getPlatforms = function (projectName) {
     name : 'osx',
     // TODO: use async fs.exists
     isAdded : fs.existsSync('platforms/osx'),
-    iconsPath : 'platforms/osx/' + projectName + xcodeFolder,
+    iconsPath : (settings.ICONS_PATH || ('platforms/osx/' + projectName + xcodeFolder)),
     icons : [
       { name : 'icon-16x16.png',    size : 16  },
       { name : 'icon-32x32.png',    size : 32  },
@@ -103,7 +104,7 @@ var getPlatforms = function (projectName) {
   platforms.push({
     name : 'windows',
     isAdded : fs.existsSync('platforms/windows'),
-    iconsPath : 'platforms/windows/images/',
+    iconsPath : (settings.ICONS_PATH || ('platforms/windows/images/')),
     icons : [
       { name : 'StoreLogo.scale-100.png', size : 50  },
       { name : 'StoreLogo.scale-125.png', size : 63  },
