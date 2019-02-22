@@ -50,7 +50,7 @@ For good results, your file should be:
 
 #### Notes:
 
-- Your `config.ml` file will not be updated by the tool (because images are automatically created in the good folders)
+- Your `config.xml` file will not be updated by the tool (because images are automatically created in the good folders)
 - Therefore, in your `config.xml`, be sure to remove all lines looking like `<icon src="res/android/ldpi.png" density="ldpi" />`
 
 ### Creating a cordova-cli hook
@@ -71,6 +71,13 @@ Then give the script +x permission:
     $ chmod +x hooks/after_prepare/cordova-icon.sh
 
 That's it. Now every time you `cordova build`, the icons will be auto generated.
+
+### Android Adaptive Icons
+If you wish to use `png`s instead of adaptive icons, add the following to your hook:
+```
+cordova-icon
+rm -rf platforms/android/app/src/main/res/mipmap-*-v26
+```
 
 ### Splash screens
 
