@@ -78,12 +78,12 @@ var getPlatforms = function (projectName) {
       { name : 'drawable-xhdpi/icon.png', size : 96 },
       { name : 'drawable-xxhdpi/icon.png', size : 144 },
       { name : 'drawable-xxxhdpi/icon.png', size : 192 },
-      { name : 'mipmap-hdpi/icon.png',  size : 72 },
-      { name : 'mipmap-ldpi/icon.png',  size : 36 },
-      { name : 'mipmap-mdpi/icon.png',  size : 48 },
-      { name : 'mipmap-xhdpi/icon.png', size : 96 },
-      { name : 'mipmap-xxhdpi/icon.png', size : 144 },
-      { name : 'mipmap-xxxhdpi/icon.png', size : 192 }
+      { name : 'mipmap-hdpi/ic_launcher.png',  size : 72 },
+      { name : 'mipmap-ldpi/ic_launcher.png',  size : 36 },
+      { name : 'mipmap-mdpi/ic_launcher.png',  size : 48 },
+      { name : 'mipmap-xhdpi/ic_launcher.png', size : 96 },
+      { name : 'mipmap-xxhdpi/ic_launcher.png', size : 144 },
+      { name : 'mipmap-xxxhdpi/ic_launcher.png', size : 192 }
     ]
   });
   platforms.push({
