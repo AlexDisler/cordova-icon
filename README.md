@@ -26,13 +26,17 @@ Then run:
 You may specify the output path and directory as follows:
 
     # output to path/to/res/icon
-    $ cordova-splash -p path/to/res icon   
-          
-WARNING: If you were using a previous version of cordova-icon and expect the generated files to be in their respective ./platforms
-path, use the compability mode:
+    $ cordova-splash --resource-path path/to/res --icon-dir=icon
 
-    $ cordova-icon -c
-    
+WARNING: If you were using a previous version of cordova-icon and expect the generated files to be in their respective ./platforms
+path, do not use the --resource-path mode:
+
+    $ cordova-icon
+
+Also if you want to generate icons for an old XCode project structure, use this option:
+
+    $ cordova-icon --xcode-old
+
 This will override the -p and -i settings.
 
 For good results, your file shoud be:
