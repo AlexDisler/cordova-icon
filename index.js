@@ -92,7 +92,7 @@ var getPlatforms = function (projectName) {
       { name : 'mipmap-mdpi/icon.png',  size : 48 },
       { name : 'mipmap-xhdpi/icon.png', size : 96 },
       { name : 'mipmap-xxhdpi/icon.png', size : 144 },
-      { name : 'mipmap-xxxhdpi/icon.png', size : 192 }
+      { name : 'mipmap-xxxhdpi/icon.png', size : 192 },
       { name : 'drawable-hdpi/icon.png',  size : 72 },
       { name : 'drawable-ldpi/icon.png',  size : 36 },
       { name : 'drawable-mdpi/icon.png',  size : 48 },
