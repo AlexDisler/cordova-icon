@@ -80,7 +80,6 @@ var getPlatforms = function (projectName) {
     iconsPath : 'platforms/android/app/src/main/res/',
     icons : [
       { name : 'drawable/icon.png',       size : 96 },
-      { name : 'drawable/icon.png',       size : 96 },
       { name : 'drawable-hdpi/icon.png',  size : 72 },
       { name : 'drawable-ldpi/icon.png',  size : 36 },
       { name : 'drawable-mdpi/icon.png',  size : 48 },
@@ -93,18 +92,18 @@ var getPlatforms = function (projectName) {
       { name : 'mipmap-xhdpi/icon.png', size : 96 },
       { name : 'mipmap-xxhdpi/icon.png', size : 144 },
       { name : 'mipmap-xxxhdpi/icon.png', size : 192 },
-      { name : 'drawable-hdpi/icon.png',  size : 72 },
-      { name : 'drawable-ldpi/icon.png',  size : 36 },
-      { name : 'drawable-mdpi/icon.png',  size : 48 },
-      { name : 'drawable-xhdpi/icon.png', size : 96 },
-      { name : 'drawable-xxhdpi/icon.png', size : 144 },
-      { name : 'drawable-xxxhdpi/icon.png', size : 192 },
-      { name : 'mipmap-hdpi/icon.png',  size : 72 },
-      { name : 'mipmap-ldpi/icon.png',  size : 36 },
-      { name : 'mipmap-mdpi/icon.png',  size : 48 },
-      { name : 'mipmap-xhdpi/icon.png', size : 96 },
-      { name : 'mipmap-xxhdpi/icon.png', size : 144 },
-      { name : 'mipmap-xxxhdpi/icon.png', size : 192 }
+      { name : 'mipmap-hdpi/ic_launcher.png',  size : 72 },
+      { name : 'mipmap-ldpi/ic_launcher.png',  size : 36 },
+      { name : 'mipmap-mdpi/ic_launcher.png',  size : 48 },
+      { name : 'mipmap-xhdpi/ic_launcher.png', size : 96 },
+      { name : 'mipmap-xxhdpi/ic_launcher.png', size : 144 },
+      { name : 'mipmap-xxxhdpi/ic_launcher.png', size : 192 },
+      { name : 'mipmap-hdpi-v26/ic_launcher_foreground.png',  size : 72 },
+      { name : 'mipmap-ldpi-v26/ic_launcher_foreground.png',  size : 36 },
+      { name : 'mipmap-mdpi-v26/ic_launcher_foreground.png',  size : 48 },
+      { name : 'mipmap-xhdpi-v26/ic_launcher_foreground.png', size : 96 },
+      { name : 'mipmap-xxhdpi-v26/ic_launcher_foreground.png', size : 144 },
+      { name : 'mipmap-xxxhdpi-v26/ic_launcher_foreground.png', size : 192 },
     ]
   });
   platforms.push({
@@ -232,6 +231,8 @@ var getProjectName = function () {
  * @return {Promise}
  */
 var generateIcon = function (platform, icon) {
+    console.log(platform);
+    console.log(icon);
   var deferred = Q.defer();
   var srcPath = settings.ICON_FILE;
   var platformPath = srcPath.replace(/\.png$/, '-' + platform.name + '.png');
@@ -239,6 +240,9 @@ var generateIcon = function (platform, icon) {
     srcPath = platformPath;
   }
   var dstPath = platform.iconsPath + icon.name;
+    console.log('platformPath' + platformPath);
+    console.log('srcPAth: ' + srcPath);
+    console.log('iconsPath: ' + platform.iconsPath);
   var dst = path.dirname(dstPath);
   if (!fs.existsSync(dst)) {
     fs.mkdirsSync(dst);
