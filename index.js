@@ -39,8 +39,14 @@ var getPlatforms = function (projectName) {
       { name: 'icon-20.png',             size : 20   },
       { name: 'icon-20@2x.png',          size : 40   },
       { name: 'icon-20@3x.png',          size : 60   },
+      { name: 'icon-24@2x.png',          size : 48   },
+      { name: 'icon-27.5@2x.png',        size : 55   },
+      { name: 'icon-29.png',             size : 29   },
+      { name: 'icon-29@2x.png',          size : 58   },
+      { name: 'icon-29@3x.png',          size : 87   },
       { name: 'icon-40.png',             size : 40   },
       { name: 'icon-40@2x.png',          size : 80   },
+      { name: 'icon-44@2x.png',          size : 88   },
       { name: 'icon-50.png',             size : 50   },
       { name: 'icon-50@2x.png',          size : 100  },
       { name: 'icon-60@2x.png',          size : 120  },
@@ -50,6 +56,8 @@ var getPlatforms = function (projectName) {
       { name: 'icon-76.png',             size : 76   },
       { name: 'icon-76@2x.png',          size : 152  },
       { name: 'icon-83.5@2x.png',        size : 167  },
+      { name: 'icon-86@2x.png',          size : 172  },
+      { name: 'icon-98@2x.png',          size : 196  },
       { name: 'icon-1024.png',           size : 1024 },
       { name: 'icon-small.png',          size : 29   },
       { name: 'icon-small@2x.png',       size : 58   },
@@ -83,7 +91,19 @@ var getPlatforms = function (projectName) {
       { name : 'mipmap-mdpi/icon.png',  size : 48 },
       { name : 'mipmap-xhdpi/icon.png', size : 96 },
       { name : 'mipmap-xxhdpi/icon.png', size : 144 },
-      { name : 'mipmap-xxxhdpi/icon.png', size : 192 }
+      { name : 'mipmap-xxxhdpi/icon.png', size : 192 },
+      { name : 'mipmap-hdpi/ic_launcher.png',  size : 72 },
+      { name : 'mipmap-ldpi/ic_launcher.png',  size : 36 },
+      { name : 'mipmap-mdpi/ic_launcher.png',  size : 48 },
+      { name : 'mipmap-xhdpi/ic_launcher.png', size : 96 },
+      { name : 'mipmap-xxhdpi/ic_launcher.png', size : 144 },
+      { name : 'mipmap-xxxhdpi/ic_launcher.png', size : 192 },
+      { name : 'mipmap-hdpi-v26/ic_launcher_foreground.png',  size : 72 },
+      { name : 'mipmap-ldpi-v26/ic_launcher_foreground.png',  size : 36 },
+      { name : 'mipmap-mdpi-v26/ic_launcher_foreground.png',  size : 48 },
+      { name : 'mipmap-xhdpi-v26/ic_launcher_foreground.png', size : 96 },
+      { name : 'mipmap-xxhdpi-v26/ic_launcher_foreground.png', size : 144 },
+      { name : 'mipmap-xxxhdpi-v26/ic_launcher_foreground.png', size : 192 },
     ]
   });
   platforms.push({
@@ -211,6 +231,8 @@ var getProjectName = function () {
  * @return {Promise}
  */
 var generateIcon = function (platform, icon) {
+    console.log(platform);
+    console.log(icon);
   var deferred = Q.defer();
   var srcPath = settings.ICON_FILE;
   var platformPath = srcPath.replace(/\.png$/, '-' + platform.name + '.png');
@@ -218,6 +240,9 @@ var generateIcon = function (platform, icon) {
     srcPath = platformPath;
   }
   var dstPath = platform.iconsPath + icon.name;
+    console.log('platformPath' + platformPath);
+    console.log('srcPAth: ' + srcPath);
+    console.log('iconsPath: ' + platform.iconsPath);
   var dst = path.dirname(dstPath);
   if (!fs.existsSync(dst)) {
     fs.mkdirsSync(dst);
