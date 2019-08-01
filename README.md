@@ -9,7 +9,7 @@ Automatic icon resizing for Cordova. Create an icon in the root folder of your C
 ```bash
 $ sudo apt-get install imagemagick
 $ # on Mac: brew install imagemagick
-$ # on Windows: http://www.imagemagick.org/script/binary-releases.php#windows (check "Legacy tools")
+$ # on Windows: https://imagemagick.org/script/download.php#windows (check "Legacy tools")
 
 $ sudo npm install cordova-icon -g
 ```
