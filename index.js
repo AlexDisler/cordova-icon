@@ -30,60 +30,73 @@ var getPlatforms = function (projectName) {
     xcodeFolder = '/Resources/icons/';
   }
 
+
   platforms.push({
     name : 'ios',
     // TODO: use async fs.exists
     isAdded : fs.existsSync('platforms/ios'),
     iconsPath : 'platforms/ios/' + projectName + xcodeFolder,
+    contentJSONPath: 'platforms/ios/' + projectName + xcodeFolder + 'Contents.json',
     icons : [
-      { name: 'icon-20.png',             size : 20   },
-      { name: 'icon-20@2x.png',          size : 40   },
-      { name: 'icon-20@3x.png',          size : 60   },
-      { name: 'icon-40.png',             size : 40   },
-      { name: 'icon-40@2x.png',          size : 80   },
-      { name: 'icon-50.png',             size : 50   },
-      { name: 'icon-50@2x.png',          size : 100  },
-      { name: 'icon-60@2x.png',          size : 120  },
-      { name: 'icon-60@3x.png',          size : 180  },
-      { name: 'icon-72.png',             size : 72   },
-      { name: 'icon-72@2x.png',          size : 144  },
-      { name: 'icon-76.png',             size : 76   },
-      { name: 'icon-76@2x.png',          size : 152  },
-      { name: 'icon-83.5@2x.png',        size : 167  },
-      { name: 'icon-1024.png',           size : 1024 },
-      { name: 'icon-small.png',          size : 29   },
-      { name: 'icon-small@2x.png',       size : 58   },
-      { name: 'icon-small@3x.png',       size : 87   },
-      { name: 'icon.png',                size : 57   },
-      { name: 'icon@2x.png',             size : 114  },
-      { name: 'AppIcon24x24@2x.png',     size : 48   },
-      { name: 'AppIcon27.5x27.5@2x.png', size : 55   },
-      { name: 'AppIcon29x29@2x.png',     size : 58   },
-      { name: 'AppIcon29x29@3x.png',     size : 87   },
-      { name: 'AppIcon40x40@2x.png',     size : 80   },
-      { name: 'AppIcon44x44@2x.png',     size : 88   },
-      { name: 'AppIcon86x86@2x.png',     size : 172  },
-      { name: 'AppIcon98x98@2x.png',     size : 196  }
-    ]
+      { name: '20pt2x.png',             size : 40   },
+      { name: '20pt3x.png',          size : 60   },
+      { name: '29pt1x.png',          size : 29   },
+      { name: '29pt2x.png',             size : 58   },
+      { name: '29pt3x.png',          size : 87   },
+      { name: '40pt2x.png',             size : 80   },
+      { name: '40pt3x.png',          size : 120  },
+      { name: '57pt1x.png',          size : 57  },
+      { name: '57pt2x.png',          size : 114  },
+      { name: '60pt2x.png',             size : 120   },
+      { name: '60pt3x.png',          size : 180  },
+      { name: '20pt1xipad.png',             size : 20   },
+      { name: '20pt2xipad.png',          size : 40  },
+      { name: '29pt1xipad.png',        size : 29  },
+      { name: '29pt2xipad.png',           size : 58 },
+      { name: '40pt1xipad.png',          size : 40   },
+      { name: '40pt2xipad.png',       size : 80   },
+      { name: '50pt1xipad.png',       size : 50   },
+      { name: '50pt2xipad.png',                size : 100   },
+      { name: '72pt1xipad.png',             size : 72  },
+      { name: '72pt2xipad.png',     size : 144   },
+      { name: '76pt1xipad.png', size : 76   },
+      { name: '76pt2xipad.png',     size : 152   },
+      { name: '83.5pt2xipad.png',     size : 167   },
+      { name: 'appstore.png',     size : 1024   },
+      { name: '38mm2xwatch.png',     size : 48   },
+      { name: '38mmshortwatch2x.png',     size : 55  },
+      { name: '29pt5858watch.png',     size : 58  },
+      { name: '29pt3xwatch.png',     size : 87  },
+      { name: '40pt44pt2xwatch.png',     size : 80  },
+      { name: '44mm2x40ptwatc.png',     size : 88  },
+      { name: '44mm2xwatch.png',     size : 100  },
+      { name: '86ptwatch172172.png',     size : 172  },
+      { name: '40mm2xshortwatch.png',     size : 196  },
+      { name: '44mmshortwatch2x.png',     size : 216  },
+      { name: 'watchappstore.png',     size : 1024  },
+    ],
   });
   platforms.push({
     name : 'android',
     isAdded : fs.existsSync('platforms/android'),
     iconsPath : 'platforms/android/app/src/main/res/',
     icons : [
-      { name : 'drawable/icon.png',       size : 96 },
-      { name : 'drawable-hdpi/icon.png',  size : 72 },
-      { name : 'drawable-ldpi/icon.png',  size : 36 },
-      { name : 'drawable-mdpi/icon.png',  size : 48 },
-      { name : 'drawable-xhdpi/icon.png', size : 96 },
-      { name : 'drawable-xxhdpi/icon.png', size : 144 },
-      { name : 'drawable-xxxhdpi/icon.png', size : 192 },
-      { name : 'mipmap-hdpi/icon.png',  size : 72 },
-      { name : 'mipmap-ldpi/icon.png',  size : 36 },
       { name : 'mipmap-mdpi/icon.png',  size : 48 },
       { name : 'mipmap-xhdpi/icon.png', size : 96 },
       { name : 'mipmap-xxhdpi/icon.png', size : 144 },
-      { name : 'mipmap-xxxhdpi/icon.png', size : 192 }
+      { name : 'mipmap-xxxhdpi/icon.png', size : 192 },
+      { name : 'mipmap-hdpi/ic_launcher.png',  size : 72 },
+       { name : 'mipmap-ldpi/ic_launcher.png',  size : 36 },
+       { name : 'mipmap-mdpi/ic_launcher.png',  size : 48 },
+       { name : 'mipmap-xhdpi/ic_launcher.png', size : 96 },
+       { name : 'mipmap-xxhdpi/ic_launcher.png', size : 144 },
+       { name : 'mipmap-xxxhdpi/ic_launcher.png', size : 192 },
+       { name : 'mipmap-hdpi-v26/ic_launcher_foreground.png',  size : 72 },
+       { name : 'mipmap-ldpi-v26/ic_launcher_foreground.png',  size : 36 },
+       { name : 'mipmap-mdpi-v26/ic_launcher_foreground.png',  size : 48 },
+       { name : 'mipmap-xhdpi-v26/ic_launcher_foreground.png', size : 96 },
+       { name : 'mipmap-xxhdpi-v26/ic_launcher_foreground.png', size : 144 },
+       { name : 'mipmap-xxxhdpi-v26/ic_launcher_foreground.png', size : 192 },
     ]
   });
   platforms.push({
@@ -254,6 +267,7 @@ var generateIcon = function (platform, icon) {
       }
     });
   }
+
   return deferred.promise;
 };
 
@@ -264,7 +278,253 @@ var generateIcon = function (platform, icon) {
  * @return {Promise}
  */
 var generateIconsForPlatform = function (platform) {
+  let data = JSON.stringify({
+    "images": [
+      {
+        "size": "20x20",
+        "idiom": "iphone",
+        "filename": "20pt2x.png",
+        "scale": "2x"
+      },
+      {
+        "size": "20x20",
+        "idiom": "iphone",
+        "filename": "20pt3x.png",
+        "scale": "3x"
+      },
+      {
+        "size": "29x29",
+        "idiom": "iphone",
+        "filename": "29pt1x.png",
+        "scale": "1x"
+      },
+      {
+        "size": "29x29",
+        "idiom": "iphone",
+        "filename": "29pt2x.png",
+        "scale": "2x"
+      },
+      {
+        "size": "29x29",
+        "idiom": "iphone",
+        "filename": "29pt3x.png",
+        "scale": "3x"
+      },
+      {
+        "size": "40x40",
+        "idiom": "iphone",
+        "filename": "40pt2x.png",
+        "scale": "2x"
+      },
+      {
+        "size": "40x40",
+        "idiom": "iphone",
+        "filename": "40pt3x.png",
+        "scale": "3x"
+      },
+      {
+        "size": "57x57",
+        "idiom": "iphone",
+        "filename": "57pt1x.png",
+        "scale": "1x"
+      },
+      {
+        "size": "57x57",
+        "idiom": "iphone",
+        "filename": "57pt2x.png",
+        "scale": "2x"
+      },
+      {
+        "size": "60x60",
+        "idiom": "iphone",
+        "filename": "60pt2x.png",
+        "scale": "2x"
+      },
+      {
+        "size": "60x60",
+        "idiom": "iphone",
+        "filename": "60pt3x.png",
+        "scale": "3x"
+      },
+      {
+        "size": "20x20",
+        "idiom": "ipad",
+        "filename": "20pt1xipad.png",
+        "scale": "1x"
+      },
+      {
+        "size": "20x20",
+        "idiom": "ipad",
+        "filename": "20pt2xipad.png",
+        "scale": "2x"
+      },
+      {
+        "size": "29x29",
+        "idiom": "ipad",
+        "filename": "29pt1xipad.png",
+        "scale": "1x"
+      },
+      {
+        "size": "29x29",
+        "idiom": "ipad",
+        "filename": "29pt2xipad.png",
+        "scale": "2x"
+      },
+      {
+        "size": "40x40",
+        "idiom": "ipad",
+        "filename": "40pt1xipad.png",
+        "scale": "1x"
+      },
+      {
+        "size": "40x40",
+        "idiom": "ipad",
+        "filename": "40pt2xipad.png",
+        "scale": "2x"
+      },
+      {
+        "size": "50x50",
+        "idiom": "ipad",
+        "filename": "50pt1xipad.png",
+        "scale": "1x"
+      },
+      {
+        "size": "50x50",
+        "idiom": "ipad",
+        "filename": "50pt2xipad.png",
+        "scale": "2x"
+      },
+      {
+        "size": "72x72",
+        "idiom": "ipad",
+        "filename": "72pt1xipad.png",
+        "scale": "1x"
+      },
+      {
+        "size": "72x72",
+        "idiom": "ipad",
+        "filename": "72pt2xipad.png",
+        "scale": "2x"
+      },
+      {
+        "size": "76x76",
+        "idiom": "ipad",
+        "filename": "76pt1xipad.png",
+        "scale": "1x"
+      },
+      {
+        "size": "76x76",
+        "idiom": "ipad",
+        "filename": "76pt2xipad.png",
+        "scale": "2x"
+      },
+      {
+        "size": "83.5x83.5",
+        "idiom": "ipad",
+        "filename": "83.5pt2xipad.png",
+        "scale": "2x"
+      },
+      {
+        "size": "1024x1024",
+        "idiom": "ios-marketing",
+        "filename": "appstore.png",
+        "scale": "1x"
+      },
+      {
+        "size": "24x24",
+        "idiom": "watch",
+        "filename": "38mm2xwatch.png",
+        "scale": "2x",
+        "role": "notificationCenter",
+        "subtype": "38mm"
+      },
+      {
+        "size": "27.5x27.5",
+        "idiom": "watch",
+        "filename": "38mmshortwatch2x.png",
+        "scale": "2x",
+        "role": "notificationCenter",
+        "subtype": "42mm"
+      },
+      {
+        "size": "29x29",
+        "idiom": "watch",
+        "filename": "29pt5858watch.png",
+        "role": "companionSettings",
+        "scale": "2x"
+      },
+      {
+        "size": "29x29",
+        "idiom": "watch",
+        "filename": "29pt3xwatch.png",
+        "role": "companionSettings",
+        "scale": "3x"
+      },
+      {
+        "size": "40x40",
+        "idiom": "watch",
+        "filename": "40pt44pt2xwatch.png",
+        "scale": "2x",
+        "role": "appLauncher",
+        "subtype": "38mm"
+      },
+      {
+        "size": "44x44",
+        "idiom": "watch",
+        "filename": "44mm2x40ptwatc.png",
+        "scale": "2x",
+        "role": "appLauncher",
+        "subtype": "40mm"
+      },
+      {
+        "size": "50x50",
+        "idiom": "watch",
+        "filename": "44mm2xwatch.png",
+        "scale": "2x",
+        "role": "appLauncher",
+        "subtype": "44mm"
+      },
+      {
+        "size": "86x86",
+        "idiom": "watch",
+        "filename": "86ptwatch172172.png",
+        "scale": "2x",
+        "role": "quickLook",
+        "subtype": "38mm"
+      },
+      {
+        "size": "98x98",
+        "idiom": "watch",
+        "filename": "40mm2xshortwatch.png",
+        "scale": "2x",
+        "role": "quickLook",
+        "subtype": "42mm"
+      },
+      {
+        "size": "108x108",
+        "idiom": "watch",
+        "filename": "44mmshortwatch2x.png",
+        "scale": "2x",
+        "role": "quickLook",
+        "subtype": "44mm"
+      },
+      {
+        "size": "1024x1024",
+        "idiom": "watch-marketing",
+        "filename": "watchappstore.png",
+        "scale": "1x"
+      }
+    ],
+    "info": {
+      "version": 1,
+      "author": "xcode"
+    }
+  }
+  )
   display.header('Generating Icons for ' + platform.name);
+  if(platform.name == 'ios') {
+    fs.writeFileSync(platform.contentJSONPath, data)
+  }
   var all = [];
   var icons = platform.icons;
   icons.forEach(function (icon) {
@@ -280,11 +540,13 @@ var generateIconsForPlatform = function (platform) {
  * @return {Promise}
  */
 var generateIcons = function (platforms) {
+
   var deferred = Q.defer();
   var sequence = Q();
   var all = [];
   _(platforms).where({ isAdded : true }).forEach(function (platform) {
     sequence = sequence.then(function () {
+
       return generateIconsForPlatform(platform);
     });
     all.push(sequence);
@@ -354,6 +616,7 @@ var configFileExists = function () {
   });
   return deferred.promise;
 };
+
 
 display.header('Checking Project & Icon');
 
